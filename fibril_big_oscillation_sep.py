@@ -24,6 +24,9 @@ from datetime import datetime
 import scipy.ndimage as spnd
 import scipy.signal as sgnl
 from mpl_toolkits import mplot3d
+from skimage import exposure
+from scipy.fftpack import fft2, ifft2
+
 
 # Font properties
 font = {'family': 'sans-serif',
@@ -222,7 +225,9 @@ for oo in range(len(file_search(outdir, "cut"+cut_file[-11:-5]+"*txt"))):
     # temp
     #--------
     tau = 23
-    im_temp = axx3.imshow(np.transpose(temp_cube[:,:,tau]).squeeze()*1e-3,
+    temp = np.transpose(temp_cube[:,:,tau]).squeeze()*1e-3
+    temp_sharpened = exposure.rescale_intensity(sharpen(temp, sigma =[1,3], unsigma = [3,1]), out_range=(np.min(temp), np.max(temp)))
+    im_temp = axx3.imshow(temp_sharpened,
                vmin = 3.7, vmax = 4.8,
                cmap = 'inferno', origin = 'lower', #aspect=ratio
                #interpolation = 'bilinear',
@@ -234,14 +239,16 @@ for oo in range(len(file_search(outdir, "cut"+cut_file[-11:-5]+"*txt"))):
     if (oo==6):
         print("nothing!2")
     else:
-        axx3.plot(trange, smth_y, color = 'white', alpha = 0.5, label = r'smthd I$_{\rm{max}}$', linewidth = 1.)
+        axx3.plot(trange, smth_y, '--', color = 'white', alpha = 0.75, label = r'smthd I$_{\rm{max}}$', linewidth = 2.)
 
 
     # v_los
     #--------
-    vlos_lim = np.round(np.max(np.abs(vlos_cube[:,:,tau])), decimals = 1)
-    im_vlos = axx4.imshow(np.transpose(vlos_cube[:,:,tau]),
-               vmin = -vlos_lim, vmax = vlos_lim,
+    vlos = np.transpose(vlos_cube[:,:,tau])
+    vlos_lim0 = np.round(np.max(np.abs(vlos)), decimals = 1)
+    vlos_sharpened  = exposure.rescale_intensity(sharpen(vlos, sigma =[1,3], unsigma = [3,1]), out_range=(np.min(vlos), np.max(vlos)))
+    im_vlos = axx4.imshow(vlos_sharpened,
+               vmin = -vlos_lim0, vmax = vlos_lim0,
                cmap = 'bwr', origin = 'lower', #aspect=ratio
                #interpolation = 'bilinear',
                #vmin=2.e-9,
@@ -252,7 +259,9 @@ for oo in range(len(file_search(outdir, "cut"+cut_file[-11:-5]+"*txt"))):
     # temp
     #--------
     tau = 28
-    im_temp0 = axx1.imshow(np.transpose(temp_cube[:,:,tau]).squeeze()*1e-3,
+    temp = np.transpose(temp_cube[:,:,tau]).squeeze()*1e-3
+    temp_sharpened = exposure.rescale_intensity(sharpen(temp, sigma =[1,3], unsigma = [3,1]), out_range=(np.min(temp), np.max(temp)))
+    im_temp0 = axx1.imshow(temp_sharpened,
                vmin = 4., vmax =5,
                cmap = 'inferno', origin = 'lower', #aspect=ratio
                #interpolation = 'bilinear',
@@ -263,8 +272,10 @@ for oo in range(len(file_search(outdir, "cut"+cut_file[-11:-5]+"*txt"))):
     
     # v_los
     #--------
-    vlos_lim0 = np.round(np.max(np.abs(vlos_cube[:,:,tau])), decimals = 1)
-    im_vlos0 = axx2.imshow(np.transpose(vlos_cube[:,:,tau]),
+    vlos = np.transpose(vlos_cube[:,:,tau])
+    vlos_lim0 = np.round(np.max(np.abs(vlos)), decimals = 1)
+    vlos_sharpened  = exposure.rescale_intensity(sharpen(vlos, sigma =[1,3], unsigma = [3,1]), out_range=(np.min(vlos), np.max(vlos)))
+    im_vlos0 = axx2.imshow(vlos_sharpened,
                vmin = -vlos_lim0, vmax = vlos_lim0,
                cmap = 'bwr', origin = 'lower', #aspect=ratio
                #interpolation = 'bilinear',
