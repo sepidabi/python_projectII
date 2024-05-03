@@ -250,7 +250,7 @@ for oo in range(len(file_search(outdir, "cut"+cut_file[-11:-5]+"*txt"))):
     im_vlos = axx4.imshow(vlos_sharpened,
                vmin = -vlos_lim0, vmax = vlos_lim0,
                cmap = 'bwr', origin = 'lower', #aspect=ratio
-               #interpolation = 'bilinear',
+               # interpolation = 'bilinear',
                #vmin=2.e-9,
                #vmax = 3.5e-9,
                aspect = 0.6,
