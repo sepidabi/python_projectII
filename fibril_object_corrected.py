@@ -312,16 +312,16 @@ for iii in range(3,len(file_search(objdir, "cut*osc0.obj"))):
                 #str(np.round(dp*100/np.mean([Ppos_m, Plos_m]))))# + '%Ppos' + ' = ' + str(np.round(dp*100/Plos_m)) + '%Plos')
                 #', Pm = ' + str(np.round(np.mean([np.mean(per_los_one),np.mean(per_pos_one)]))))                
                 #print('max', str(iii)+'-'+str(jjj), 2*lag[np.argmax(ncc)], per_one_dom, dphi_one)
-                ucheck = input('1 or 0? ')
-                if ucheck==1:
-                    dphi_one = lag[np.argmax(ncc)]/per_one_dom
-                    #if (dphi_one>1):
-                        #dphi_one = 2 - dphi_one
-                    dphi = np.append(dphi, dphi_one)
-                    #if (dphi_one<0):
-                    #   dphi_one = 2+dphi_one
-                if ucheck==0:
-                    dphi = np.append(dphi, -5)
+                #ucheck = input('1 or 0? ')
+                #if ucheck==1:
+                 #   dphi_one = lag[np.argmax(ncc)]/per_one_dom
+                  #  #if (dphi_one>1):
+                   #     #dphi_one = 2 - dphi_one
+                   # dphi = np.append(dphi, dphi_one)
+                   # #if (dphi_one<0):
+                   # #   dphi_one = 2+dphi_one
+                #if ucheck==0:
+                 #   dphi = np.append(dphi, -5)
                     
             elif (np.min(ncc)<-corr_thre and np.abs(lag[np.argmin(ncc)])<=per_one_dom and np.max(ncc)<np.abs(np.min(ncc))):
                 #test = np.abs(np.diff(lag[extrem(ncc, np.less)]))[np.argmin(np.abs(np.diff(lag[extrem(ncc, np.less)])) - per_one_dom)],#]),
@@ -344,14 +344,14 @@ for iii in range(3,len(file_search(objdir, "cut*osc0.obj"))):
                 #print('Plos = ', per_pos_one)
                 #print('Ppos = ', per_los_one)
 
-                ucheck = input('1 or 0? ')
-                if ucheck==1:
-                    dphi_one = lag[np.argmin(ncc)]/per_one_dom
-                    #if (dphi_one<0):
-                    #   dphi_one = 2+dphi_one
-                    dphi = np.append(dphi, dphi_one)
-                if ucheck==0:
-                    dphi = np.append(dphi, -5)
+                #ucheck = input('1 or 0? ')
+                #if ucheck==1:
+                  #  dphi_one = lag[np.argmin(ncc)]/per_one_dom
+                   # #if (dphi_one<0):
+                   # #   dphi_one = 2+dphi_one
+                   # dphi = np.append(dphi, dphi_one)
+                #if ucheck==0:
+                 #   dphi = np.append(dphi, -5)
 
             else:
                 dphi = np.append(dphi, -5)
