@@ -151,8 +151,8 @@ A_los_m = np.zeros(0)
 A_pos_one = np.zeros(0)
 A_pos = np.zeros(0)
 A_pos_m = np.zeros(0)
-dphi = np.load('dphi.npy') # np.zeros(0)
-
+dphi = np.load('dphi.npy')
+#dphi = np.zeros(0)
 ncc_min = np.zeros(0)
 ncc_max =  np.zeros(0)
 
@@ -172,7 +172,7 @@ print('index                                  |dP|           Ppos_m       Ppos_d
 print('-----------------------------------------------------------------------------------------------------------------------')
 ind = 0
 
-for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
+for iii in range(3,len(file_search(objdir, "cut*osc0.obj"))):
     cut_indx = file_search(objdir, "cut*osc0.obj")[iii][3:12]
     
     # coords of the centere of oscillation
@@ -312,16 +312,16 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
                 #str(np.round(dp*100/np.mean([Ppos_m, Plos_m]))))# + '%Ppos' + ' = ' + str(np.round(dp*100/Plos_m)) + '%Plos')
                 #', Pm = ' + str(np.round(np.mean([np.mean(per_los_one),np.mean(per_pos_one)]))))                
                 #print('max', str(iii)+'-'+str(jjj), 2*lag[np.argmax(ncc)], per_one_dom, dphi_one)
-                #ucheck = input('1 or 0? ')
-                #if ucheck==1:
-                 #   dphi_one = lag[np.argmax(ncc)]/per_one_dom
-                  #  #if (dphi_one>1):
-                   #     #dphi_one = 2 - dphi_one
-                   # dphi = np.append(dphi, dphi_one)
-                   # #if (dphi_one<0):
-                   # #   dphi_one = 2+dphi_one
-                #if ucheck==0:
-                 #   dphi = np.append(dphi, -5)
+                ucheck = input('1 or 0? ')
+                if ucheck==1:
+                    dphi_one = lag[np.argmax(ncc)]/per_one_dom
+                    #if (dphi_one>1):
+                        #dphi_one = 2 - dphi_one
+                    dphi = np.append(dphi, dphi_one)
+                    #if (dphi_one<0):
+                    #   dphi_one = 2+dphi_one
+                if ucheck==0:
+                    dphi = np.append(dphi, -5)
                     
             elif (np.min(ncc)<-corr_thre and np.abs(lag[np.argmin(ncc)])<=per_one_dom and np.max(ncc)<np.abs(np.min(ncc))):
                 #test = np.abs(np.diff(lag[extrem(ncc, np.less)]))[np.argmin(np.abs(np.diff(lag[extrem(ncc, np.less)])) - per_one_dom)],#]),
@@ -344,19 +344,19 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
                 #print('Plos = ', per_pos_one)
                 #print('Ppos = ', per_los_one)
 
-                #ucheck = input('1 or 0? ')
-                #if ucheck==1:
-                 #   dphi_one = lag[np.argmin(ncc)]/per_one_dom
-                  #  #if (dphi_one<0):
-                   # #   dphi_one = 2+dphi_one
-                   # dphi = np.append(dphi, dphi_one)
-                #if ucheck==0:
-                 #   dphi = np.append(dphi, -5)
+                ucheck = input('1 or 0? ')
+                if ucheck==1:
+                    dphi_one = lag[np.argmin(ncc)]/per_one_dom
+                    #if (dphi_one<0):
+                    #   dphi_one = 2+dphi_one
+                    dphi = np.append(dphi, dphi_one)
+                if ucheck==0:
+                    dphi = np.append(dphi, -5)
 
-            #else:
-             #   dphi = np.append(dphi, -5)
+            else:
+                dphi = np.append(dphi, -5)
         else:
-            #dphi = np.append(dphi,-10)
+            dphi = np.append(dphi,-10)
             per_dom = np.append(0, per_dom)
 
         mid_coord_x = np.append(mid_coord_x, osc_mid_coord[0])
