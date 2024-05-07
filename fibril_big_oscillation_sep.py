@@ -287,7 +287,7 @@ for oo in range(len(file_search(outdir, "cut"+cut_file[-11:-5]+"*txt"))):
     if (oo==6):
         print("nothing!2")
     else:
-        axx4.plot(trange, smth_y, color = 'black', alpha = 0.5, label = r'smthd I$_{\rm{max}}$', linewidth = 1.)
+        axx4.plot(trange, smth_y,'--', color = 'black', alpha = 0.5, label = r'smthd I$_{\rm{max}}$', linewidth = 1.)
 
 
     # smooth fit to the oscillations
