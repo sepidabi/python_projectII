@@ -460,4 +460,4 @@ for ii in range(len(file_search(fibdir,'crispex*3950*.csav'))):
 
         #stop()
         plt.close("all")
-    stop()
+    #stop()
