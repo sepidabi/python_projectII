@@ -172,7 +172,7 @@ print('index                                  |dP|           Ppos_m       Ppos_d
 print('-----------------------------------------------------------------------------------------------------------------------')
 ind = 0
 
-for iii in range(3,len(file_search(objdir, "cut*osc0.obj"))):
+for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
     cut_indx = file_search(objdir, "cut*osc0.obj")[iii][3:12]
     
     # coords of the centere of oscillation
