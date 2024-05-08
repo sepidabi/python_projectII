@@ -151,8 +151,8 @@ A_los_m = np.zeros(0)
 A_pos_one = np.zeros(0)
 A_pos = np.zeros(0)
 A_pos_m = np.zeros(0)
-dphi = np.load('dphi.npy')
-#dphi = np.zeros(0)
+#dphi = np.load('dphi.npy')
+dphi = np.zeros(0)
 ncc_min = np.zeros(0)
 ncc_max =  np.zeros(0)
 
@@ -221,19 +221,19 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
         ncc = sgnl.correlate(vpos_f_norm, vlos_f_norm, mode = 'full')
         ncc_min = np.append(ncc_min, np.min(ncc))
         ncc_max = np.append(ncc_max, np.max(ncc))
-        
-        # average calculations
+
+        # OSCILLATION VALIDITY CHECK
         if ((len(osc.los_ymin)!=0 and len(osc.los_ymax)!=0)
             and (len(osc.pos_ymin)!=0 and len(osc.pos_ymax)!=0)):
+
+            # average calculations
+            #---------------------------
+
             # LOS Amplitude
             A_los_m = np.append(A_los_m, np.mean([np.mean(np.abs(osc.los_ymax)), np.mean(np.abs(osc.los_ymin))]))
             # POS Amplitude
             A_pos_m = np.append(A_pos_m, np.mean([np.mean(np.abs(osc.pos_ymax)), np.mean(np.abs(osc.pos_ymin))]))
-            
-        # OSCILLATION VALIDITY CHECK
-        
-        if (len(osc.los_ncc_xmax)!=0 and len(osc.pos_ncc_xmax)!=0):
-            #print(cut_indx, osc_fname)
+                    
             # LOS Period
             pe_l = np.sort(np.append(osc.los_xmax, osc.los_xmin))
             
@@ -250,7 +250,7 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
             per_los = np.append(per_los, per_los_one)
             #per_los_dom = np.append(per_los_dom, per_los_one[np.argmin(np.abs(per_los_one-osc.los_ncc_xmax[0]))])
             per_los_m = np.append(per_los_m, np.mean(per_los_one))
-            A_los_m = np.append(A_los_m, np.mean([np.mean(np.abs(osc.los_ymax)), np.mean(np.abs(osc.los_ymin))]))
+            #A_los_m = np.append(A_los_m, np.mean([np.mean(np.abs(osc.los_ymax)), np.mean(np.abs(osc.los_ymin))]))
             
             
             # POS period
@@ -268,7 +268,7 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
             per_pos = np.append(per_pos, per_pos_one) 
             #per_pos_dom = np.append(per_pos_dom, per_pos_one[np.argmin(np.abs(per_pos_one-osc.pos_ncc_xmax[0]))])
             per_pos_m = np.append(per_pos_m, np.mean(per_pos_one))
-            A_pos_m = np.append(A_pos_m, np.mean([np.mean(np.abs(osc.pos_ymax)), np.mean(np.abs(osc.pos_ymin))]))
+            #A_pos_m = np.append(A_pos_m, np.mean([np.mean(np.abs(osc.pos_ymax)), np.mean(np.abs(osc.pos_ymin))]))
             
             
             ssize = 30 # plotting marker size
@@ -282,9 +282,9 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
             Plos_m = np.mean(per_los_one)
             Plos_dom = np.max(per_los_one)
             dp = np.round(np.abs(Ppos_m - Plos_m), decimals = 1)
-            dp_dom = np.round(np.abs(per_pos_dom - per_los_dom), decimals = 1)
+            #dp_dom = np.round(np.abs(per_pos_dom - per_los_dom), decimals = 1)
 
-            corr_thre = 0.6 # the cross-correlation threshold above which the oscillations are assumed to be (anti)correlated
+            corr_thre = 0.5 # the cross-correlation threshold above which the oscillations are assumed to be (anti)correlated
 
             if (np.max(ncc)>corr_thre and np.abs(lag[np.argmax(ncc)])<=per_one_dom and np.max(ncc)>np.abs(np.min(ncc))):
                 #test = np.abs(np.diff(lag[extrem(ncc, np.greater)]))[np.argmin(np.abs(np.diff(lag[extrem(ncc, np.greater)])) - per_one_dom)],#]),
@@ -313,7 +313,7 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
                 #', Pm = ' + str(np.round(np.mean([np.mean(per_los_one),np.mean(per_pos_one)]))))                
                 #print('max', str(iii)+'-'+str(jjj), 2*lag[np.argmax(ncc)], per_one_dom, dphi_one)
                 
-                ucheck = input('1 or 0? ')
+                ucheck = 1#input('1 or 0? ')
                 '''eps = 0.25 # percentage allowing the dP can be smaller than
                 if dp<eps*np.min([Ppos_m,Plos_m]):
                     ucheck = 1
@@ -350,7 +350,7 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
                 #print('Plos = ', per_pos_one)
                 #print('Ppos = ', per_los_one)
 
-                ucheck = input('1 or 0? ')
+                ucheck = 1#input('1 or 0? ')
                 '''if dp<eps*np.min([Ppos_m,Plos_m]):
                     ucheck = 1
                 else:
@@ -367,7 +367,7 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
                 dphi = np.append(dphi, -5)
         else:
             dphi = np.append(dphi,-10)
-            per_dom = np.append(0, per_dom)
+           per_dom = np.append(0, per_dom)
 
         mid_coord_x = np.append(mid_coord_x, osc_mid_coord[0])
         mid_coord_y = np.append(mid_coord_y, osc_mid_coord[1])
@@ -376,10 +376,10 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
         #if (np.abs(np.min(ncc))>np.max(ncc)):
          #   cor_rate = np.append(cor_rate, np.min(ncc))
         
-        if (np.abs(np.min(ncc))<=np.max(ncc)):
-            mid_coord_x = np.append(mid_coord_x, osc_mid_coord[0])
-            mid_coord_y = np.append(mid_coord_y, osc_mid_coord[1])
-            cor_rate = np.append(cor_rate, np.max(ncc))
+        #if (np.abs(np.min(ncc))<=np.max(ncc)):
+         #   mid_coord_x = np.append(mid_coord_x, osc_mid_coord[0])
+          #  mid_coord_y = np.append(mid_coord_y, osc_mid_coord[1])
+           # cor_rate = np.append(cor_rate, np.max(ncc))
             
 #stop()            
             
@@ -621,8 +621,8 @@ axins.set_xticklabels([r'0', r'$\pi$/2', r'$\pi$'], fontdict = font)
 plt.tight_layout()
 filename = outdir + 'analys_dphi.pdf'
 plt.show()
-fifi.savefig(filename, dpi = 1000)
-stop()
+#fifi.savefig(filename, dpi = 1000)
+#stop()
 plt.close(fifi)
 
 #axfi.set_xlim([-bin_centers[0]/2,1])
@@ -653,27 +653,32 @@ ax_map.contourf(np.abs(CPtot[y1:y2, x1:x2]).squeeze()*1e2, cmap = 'Blues', alpha
 contour = ax_map.contour(np.abs(CPtot[y1:y2, x1:x2]).squeeze()*1e2, colors = ['white', 'white'], alpha = 0.75, levels = [2,8], linewidths = [0.5,0.5])
 for i in range (len(mid_coord_x)):
     if (dphi[i]>=-1):
-        sc = ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, c = np.abs(cor_rate[i]), marker=(3, 0, theta[i]), cmap = cmap_phi, s = np.power(per_dom[i]/np.max(per_dom), 2)*ssize, alpha = 0.5, vmin =0, vmax = 1)
+        sc = ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, c = np.abs(cor_rate[i]), marker=(2, 0, theta[i]), cmap = cmap_phi, s = np.power(per_dom[i]/np.max(per_dom), 2)*ssize, alpha = 0.5, vmin =0, vmax = 1)
         dist_i = np.sqrt(contour.find_nearest_contour(mid_coord_x[i]-x1, mid_coord_y[i]-y1)[5])
         dist = np.append(dist, dist_i)
         ratio = np.append(ratio,dist_i/per_dom[i])
+        print(np.power(per_dom[i]/np.max(per_dom), 2)*ssize)
+
     elif (dphi[i]==-5):
-        ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, marker=(3, 0, theta[i]) , s = np.power(per_dom[i]/np.max(per_dom), 2)*ssize, alpha = 0.5, color = 'gray')
+        ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, marker=(2, 0, theta[i]) , s = np.power(per_dom[i]/np.max(per_dom), 2)*ssize, alpha = 0.5, color = 'gray')
         #dist_i = np.sqrt(contour.find_nearest_contour(mid_coord_x[i]-x1, mid_coord_y[i]-y1)[5])
         #dist = np.append(dist, dist_i)
         #ratio = np.append(ratio,dist_i/per_dom[i])
     else:
-        ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, marker='x' , s = 25, alpha = 0.5, color = 'white')
+        ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, marker='.' , s = 10, alpha = 0.5, color = 'white')
+        print('-',mid_coord_x[i],mid_coord_y[i],dphi[i])
+plt.show()
+stop()
 #ax_map.scatter(x=100,  y = 100, marker = (3,0,0), s = np.power(140/np.max(per_dom), 2)*ssize)
 hands =np.array( [140,240,340,440.])
 sizes = np.sqrt(np.power(hands/np.max(per_dom), 2)*ssize)
 #sizes = np.power(sizes,0.5)
-legend_elements = [Line2D([0], [0], marker='^', color='w', label='140',markerfacecolor='gray', markersize=sizes[0], linestyle='None', markeredgecolor = 'darkgray'), #linewidth = 1.),
-                   Line2D([], [], marker='^', color='w', label='240',markerfacecolor='gray', markersize=sizes[1], linestyle='None', markeredgecolor = 'darkgray'),
-                   Line2D([], [], marker='^', color='w', label='340',markerfacecolor='gray', markersize=sizes[2], linestyle='None', markeredgecolor = 'darkgray'),
-                   Line2D([], [], marker='^', color='w', label='440',markerfacecolor='gray', markersize=sizes[3], linestyle='None', markeredgecolor = 'darkgray'),
-                   Line2D([], [], marker='^', color='w', label='',markerfacecolor='gray', markersize=0, linestyle='None'),
-                   Line2D([], [], marker='^', color='w', label='',markerfacecolor='gray', markersize=0, linestyle='None'),
+legend_elements = [Line2D([0], [0], marker='_', color='w', label='140',markerfacecolor='gray', markersize=sizes[0], linestyle='None', markeredgecolor = 'darkgray'), #linewidth = 1.),
+                   Line2D([], [], marker='_', color='w', label='240',markerfacecolor='gray', markersize=sizes[1], linestyle='None', markeredgecolor = 'darkgray'),
+                   Line2D([], [], marker='_', color='w', label='340',markerfacecolor='gray', markersize=sizes[2], linestyle='None', markeredgecolor = 'darkgray'),
+                   Line2D([], [], marker='_', color='w', label='440',markerfacecolor='gray', markersize=sizes[3], linestyle='None', markeredgecolor = 'darkgray'),
+                   Line2D([], [], marker='_', color='w', label='',markerfacecolor='gray', markersize=0, linestyle='None'),
+                   Line2D([], [], marker='_', color='w', label='',markerfacecolor='gray', markersize=0, linestyle='None'),
 ]
 
 lghd = ax_map.legend(handles=legend_elements, loc='lower right', framealpha = 0., title = r'P$_{\rm{mean}}$ [s]',borderpad = 1.2, prop={'size' : 8.}, labelspacing = 1.2)#, title_fontsize = 8.,markerscale = 0.5,borderpad = 0.15)
@@ -702,7 +707,8 @@ ytick_pos = np.arange(0,(np.round(yy/sc_fact))*sc_fact,sc_fact/2.)
 ytick_lab = np.round(ytick_pos*res).astype(int)
 xtick_pos = np.arange(0,(np.round(xx/sc_fact))*sc_fact,sc_fact/2.)
 xtick_lab = np.round(xtick_pos*res).astype(int)
-
+plt.show()
+stop()
 ax_map.set_xticks(xtick_pos)
 ax_map.set_xlim(0,xx)
 ax_map.set_ylim(0,yy)
