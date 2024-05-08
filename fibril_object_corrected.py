@@ -226,13 +226,13 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
         if ((len(osc.los_ymin)!=0 and len(osc.los_ymax)!=0)
             and (len(osc.pos_ymin)!=0 and len(osc.pos_ymax)!=0)):
             # LOS Amplitude
-            #A_los_m = np.append(A_los_m, np.mean([np.mean(np.abs(osc.los_ymax)), np.mean(np.abs(osc.los_ymin))]))
+            A_los_m = np.append(A_los_m, np.mean([np.mean(np.abs(osc.los_ymax)), np.mean(np.abs(osc.los_ymin))]))
             # POS Amplitude
-            #A_pos_m = np.append(A_pos_m, np.mean([np.mean(np.abs(osc.pos_ymax)), np.mean(np.abs(osc.pos_ymin))]))
+            A_pos_m = np.append(A_pos_m, np.mean([np.mean(np.abs(osc.pos_ymax)), np.mean(np.abs(osc.pos_ymin))]))
             
         # OSCILLATION VALIDITY CHECK
         
-        #if (len(osc.los_ncc_xmax)!=0 and len(osc.pos_ncc_xmax)!=0):
+        if (len(osc.los_ncc_xmax)!=0 and len(osc.pos_ncc_xmax)!=0):
             #print(cut_indx, osc_fname)
             # LOS Period
             pe_l = np.sort(np.append(osc.los_xmax, osc.los_xmin))
@@ -244,8 +244,8 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
             if (len(pe_l)>3):
                 for l in range (len(pe_l)-3):
                     per_los_one = np.append(per_los_one, (pe_l[l+3]-pe_l[l+1]+pe_l[l+2]-pe_l[l])/2.)
-            #if (len(pe_l)==1):
-             #   per_los_one = pe_l*2
+            if (len(pe_l)==1):
+                per_los_one = pe_l*2
             per_los_dom = np.max(per_los_one)    
             per_los = np.append(per_los, per_los_one)
             #per_los_dom = np.append(per_los_dom, per_los_one[np.argmin(np.abs(per_los_one-osc.los_ncc_xmax[0]))])
@@ -284,7 +284,7 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
             dp = np.round(np.abs(Ppos_m - Plos_m), decimals = 1)
             dp_dom = np.round(np.abs(per_pos_dom - per_los_dom), decimals = 1)
 
-            corr_thre = 0.5 # the cross-correlation threshold above which the oscillations are assumed to be (anti)correlated
+            corr_thre = 0.6 # the cross-correlation threshold above which the oscillations are assumed to be (anti)correlated
 
             if (np.max(ncc)>corr_thre and np.abs(lag[np.argmax(ncc)])<=per_one_dom and np.max(ncc)>np.abs(np.min(ncc))):
                 #test = np.abs(np.diff(lag[extrem(ncc, np.greater)]))[np.argmin(np.abs(np.diff(lag[extrem(ncc, np.greater)])) - per_one_dom)],#]),
@@ -312,16 +312,22 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
                 #str(np.round(dp*100/np.mean([Ppos_m, Plos_m]))))# + '%Ppos' + ' = ' + str(np.round(dp*100/Plos_m)) + '%Plos')
                 #', Pm = ' + str(np.round(np.mean([np.mean(per_los_one),np.mean(per_pos_one)]))))                
                 #print('max', str(iii)+'-'+str(jjj), 2*lag[np.argmax(ncc)], per_one_dom, dphi_one)
-                #ucheck = input('1 or 0? ')
-                #if ucheck==1:
-                 #   dphi_one = lag[np.argmax(ncc)]/per_one_dom
-                  #  #if (dphi_one>1):
-                   #     #dphi_one = 2 - dphi_one
-                   # dphi = np.append(dphi, dphi_one)
-                   # #if (dphi_one<0):
-                   # #   dphi_one = 2+dphi_one
-                #if ucheck==0:
-                 #   dphi = np.append(dphi, -5)
+                
+                ucheck = input('1 or 0? ')
+                '''eps = 0.25 # percentage allowing the dP can be smaller than
+                if dp<eps*np.min([Ppos_m,Plos_m]):
+                    ucheck = 1
+                else:
+                    ucheck = 0'''
+                if ucheck==1:
+                    dphi_one = lag[np.argmax(ncc)]/per_one_dom
+                    #if (dphi_one>1):
+                        #dphi_one = 2 - dphi_one
+                    dphi = np.append(dphi, dphi_one)
+                    #if (dphi_one<0):
+                    #   dphi_one = 2+dphi_one
+                if ucheck==0:
+                    dphi = np.append(dphi, -5)
                     
             elif (np.min(ncc)<-corr_thre and np.abs(lag[np.argmin(ncc)])<=per_one_dom and np.max(ncc)<np.abs(np.min(ncc))):
                 #test = np.abs(np.diff(lag[extrem(ncc, np.less)]))[np.argmin(np.abs(np.diff(lag[extrem(ncc, np.less)])) - per_one_dom)],#]),
@@ -344,14 +350,18 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
                 #print('Plos = ', per_pos_one)
                 #print('Ppos = ', per_los_one)
 
-                #ucheck = input('1 or 0? ')
-                #if ucheck==1:
-                  #  dphi_one = lag[np.argmin(ncc)]/per_one_dom
-                   # #if (dphi_one<0):
-                   # #   dphi_one = 2+dphi_one
-                   # dphi = np.append(dphi, dphi_one)
-                #if ucheck==0:
-                 #   dphi = np.append(dphi, -5)
+                ucheck = input('1 or 0? ')
+                '''if dp<eps*np.min([Ppos_m,Plos_m]):
+                    ucheck = 1
+                else:
+                    ucheck = 0'''
+                if ucheck==1:
+                    dphi_one = lag[np.argmin(ncc)]/per_one_dom
+                    #if (dphi_one<0):
+                    #   dphi_one = 2+dphi_one
+                    dphi = np.append(dphi, dphi_one)
+                if ucheck==0:
+                    dphi = np.append(dphi, -5)
 
             else:
                 dphi = np.append(dphi, -5)
@@ -366,10 +376,10 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
         #if (np.abs(np.min(ncc))>np.max(ncc)):
          #   cor_rate = np.append(cor_rate, np.min(ncc))
         
-        #if (np.abs(np.min(ncc))<=np.max(ncc)):
-         #   mid_coord_x = np.append(mid_coord_x, osc_mid_coord[0])
-          #  mid_coord_y = np.append(mid_coord_y, osc_mid_coord[1])
-           # cor_rate = np.append(cor_rate, np.max(ncc))
+        if (np.abs(np.min(ncc))<=np.max(ncc)):
+            mid_coord_x = np.append(mid_coord_x, osc_mid_coord[0])
+            mid_coord_y = np.append(mid_coord_y, osc_mid_coord[1])
+            cor_rate = np.append(cor_rate, np.max(ncc))
             
 #stop()            
             
@@ -611,8 +621,8 @@ axins.set_xticklabels([r'0', r'$\pi$/2', r'$\pi$'], fontdict = font)
 plt.tight_layout()
 filename = outdir + 'analys_dphi.pdf'
 plt.show()
-#fifi.savefig(filename, dpi = 1000)
-#stop()
+fifi.savefig(filename, dpi = 1000)
+stop()
 plt.close(fifi)
 
 #axfi.set_xlim([-bin_centers[0]/2,1])
@@ -717,7 +727,7 @@ filename = outdir + 'analys_fibril_coords.pdf'
 #map_cak.savefig(filename, dpi = 1000)
 print('file saved to: '+ filename)
 plt.show()
-
+stop()
 # fibril idstance and period correlation
 plt.figure()
 plt.plot(dist/ratio, dist, 'r.')
