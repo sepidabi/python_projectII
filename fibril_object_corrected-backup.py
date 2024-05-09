@@ -381,7 +381,7 @@ for iii in range(len(file_search(objdir, "cut*osc0.obj"))):
           #  mid_coord_y = np.append(mid_coord_y, osc_mid_coord[1])
            # cor_rate = np.append(cor_rate, np.max(ncc))
             
-#stop()            
+stop()            
             
 ##########
 # JOINT PLOTS
