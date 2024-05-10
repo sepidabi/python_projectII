@@ -332,11 +332,10 @@ for ii in range(len(file_search(fibdir,'crispex*3950*.csav'))):
         ##############################
         phase = 0
         osc_cat = "undefined"
-
         case = oscillation(lag_half*8., vpos_f, vlos_f, ncc_pos_half*8, ncc_los_half*8, pos_xmax*8., pos_ymax, pos_xmin*8, pos_ymin, pos_ncc_xmax*8., pos_ncc_ymax, los_xmax*8., los_ymax, los_xmin*8, los_ymin, los_ncc_xmax*8., los_ncc_ymax, osc_mid_coord, phase, osc_cat)
         #print(case.pos_xmax*8)
         #stop()
-        objname = objdir + "cut" + cut_file[-14:-5] + "_osc" + str(oo) + ".obj"
+        objname = objdir + osc_fname[-30:-4] + "-no"+ str(oo)+ ".obj"
         save_obj(objname, case)
 
         # plotting settings
@@ -456,6 +455,13 @@ for ii in range(len(file_search(fibdir,'crispex*3950*.csav'))):
         #fc.savefig(outdir +osc_fname[31:-4]+ "no"+ str(oo)+".pdf", quality = 100)
         osc_fname_plot = outdir+"tot"+osc_fname[31:-4]+"_NCC-"+ "no"+ str(oo)+".pdf"
         fig.savefig(osc_fname_plot, quality = 100)
+        
+        if ((len(case.los_ymin)==0 or len(case.los_ymax)==0)
+            or (len(case.pos_ymin)==0 or len(case.pos_ymax)==0)):
+            print(osc_fname)
+            plt.show()
+            #stop()
+
 
 
         #stop()
