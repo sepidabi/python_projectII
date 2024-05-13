@@ -21,6 +21,56 @@ from scipy.signal import argrelextrema as extrem
 from matplotlib.lines import Line2D
 from matplotlib.colors import LinearSegmentedColormap
 from mpl_toolkits.axes_grid.inset_locator import inset_axes
+from matplotlib.lines import Line2D
+from matplotlib.markers import MarkerStyle
+from matplotlib.transforms import Affine2D
+
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+########
+# functions
+#########
+def gen_arrow_head_marker(rot):
+    """generate a marker to plot with matplotlib scatter, plot, ...
+
+    https://matplotlib.org/stable/api/markers_api.html#module-matplotlib.markers
+
+    rot=0: positive x direction
+    Parameters
+    ----------
+    rot : float
+        rotation in degree
+        0 is positive x direction
+
+    Returns
+    -------
+    arrow_head_marker : Path
+        use this path for marker argument of plt.scatter
+    scale : float
+        multiply a argument of plt.scatter with this factor got get markers
+        with the same size independent of their rotation.
+        Paths are autoscaled to a box of size -1 <= x, y <= 1 by plt.scatter
+    """
+    arr = np.array([[0, 0], [.2, -.9], [-.2, -.9], [0, 0]])  # arrow shape
+    angle = rot / 180 * np.pi
+    rot_mat = np.array([
+        [np.cos(angle), np.sin(angle)],
+        [-np.sin(angle), np.cos(angle)]
+        ])
+    arr = np.matmul(arr, rot_mat)  # rotates the arrow
+
+    # scale
+    x0 = np.amin(arr[:, 0])
+    x1 = np.amax(arr[:, 0])
+    y0 = np.amin(arr[:, 1])
+    y1 = np.amax(arr[:, 1])
+    scale = np.amax(np.abs([x0, x1, y0, y1]))
+    codes = [mpl.path.Path.MOVETO, mpl.path.Path.LINETO,mpl.path.Path.LINETO, mpl.path.Path.CLOSEPOLY]
+    arrow_head_marker = mpl.path.Path(arr, codes)
+    return arrow_head_marker, scale
+
 
 # Font properties
 font = {'family': 'sans-serif',
@@ -98,7 +148,8 @@ cube_cak = lp_read(datadir+file_cak[0],datadir+file_cak[1])
 # CaK Core
 cak_wc = 13
 fr = 59
-cak_core = unsharp(cube_cak[fr,0, cak_wc, :, :], alpha = 0.5, sigma = 5.)
+#cak_int = sharpen(np.mean(cube_cak[fr,0, cak_wc-3:cak_wc+3, :, :],axis = 0), sigma =[3,3], unsigma = [1,1])
+cak_int = unsharp(np.mean(cube_cak[fr,0, cak_wc-3:cak_wc+3, :, :],axis = 0), alpha = 0.5, sigma = 2.)
 # photosphere CPtot
 fe_cont = cube_fe[fr,0,-1,:,:]
 CPtot = unsharp(0.5*(np.mean(cube_fe[fr,3,0:7,:,:], axis=0) - np.mean(cube_fe[fr,3,7:-1,:,:], axis=0))/fe_cont, alpha = 0.5, sigma = 2.)
@@ -438,37 +489,42 @@ plt.close("all")
 map_cak = plt.figure(figsize = (4,6))
 gs_map = gridspec.GridSpec(ncols = 1,nrows = 1, figure = map_cak)
 ax_map =  plt.subplot(gs_map[0,0])
-ax_map.imshow(cak_core[y1:y2, x1:x2], cmap = 'gray', origin = 'lower')
-ax_map.contourf(np.abs(CPtot[y1:y2, x1:x2]).squeeze()*1e2, cmap = 'Blues', alpha = 0.5, levels = [2,8])
-contour = ax_map.contour(np.abs(CPtot[y1:y2, x1:x2]).squeeze()*1e2, colors = ['white', 'white'], alpha = 0.75, levels = [2,8], linewidths = [0.5,0.5])
+roi = cak_int[y1:y2, x1:x2]
+ax_map.imshow(roi, cmap = 'gray', origin = 'lower')
+c_levels = [4.5,8] # contour levels
+ax_map.contourf(np.abs(CPtot[y1:y2, x1:x2]).squeeze()*1e2, cmap = 'Blues', alpha = 0.25, levels = c_levels)
+contour = ax_map.contour(np.abs(CPtot[y1:y2, x1:x2]).squeeze()*1e2, colors = ['white', 'white'], alpha = 0.5, levels = c_levels, linewidths = [0.5,0.5])
+#common_style = {k: v for k, v in filled_marker_style.items() if k != 'marker'}
 for i in range (len(mid_coord_x)):
+    marker, scale = gen_arrow_head_marker(theta[i])
+    markersize = np.power(per_m[i]/np.max(per_m), 2)*ssize
     if (dphi[i]>=-1):
-        sc = ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, c = np.abs(cor_rate[i]), marker=(2, 0, theta[i]), cmap = cmap_phi, s = np.power(per_m[i]/np.max(per_m), 2)*ssize, alpha = 0.5, vmin =0, vmax = 1)
+        sc = ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, c = np.abs(cor_rate[i]), marker=marker, cmap = cmap_phi, s = per_m[i], alpha = 0.6, vmin =0, vmax = 1)
         dist_i = np.sqrt(contour.find_nearest_contour(mid_coord_x[i]-x1, mid_coord_y[i]-y1)[5])
         dist = np.append(dist, dist_i)
         ratio = np.append(ratio,dist_i/per_m[i])
         #print(np.power(per_m[i]/np.max(per_m), 2)*ssize)
 
     elif (dphi[i]==-5):
-        ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, marker=(2, 0, theta[i]) , s = np.power(per_m[i]/np.max(per_m), 2)*ssize, alpha = 0.5, color = 'gray')
+        ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, marker=marker , s = markersize, alpha = 0.6, color = 'gray')
         #dist_i = np.sqrt(contour.find_nearest_contour(mid_coord_x[i]-x1, mid_coord_y[i]-y1)[5])
         #dist = np.append(dist, dist_i)
         #ratio = np.append(ratio,dist_i/per_m[i])
     else:
-        ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, marker='.' , s = 10, alpha = 0.5, color = 'white')
+        ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, marker='.' , s = 10, alpha = 0.6, color = 'white')
         #print('-',mid_coord_x[i],mid_coord_y[i],dphi[i])
 plt.show()
 #
 #ax_map.scatter(x=100,  y = 100, marker = (3,0,0), s = np.power(140/np.max(per_m), 2)*ssize)
-hands =np.array( [140,240,340,440.])
+hands =np.array([120,240,340,440.])
 sizes = np.sqrt(np.power(hands/np.max(per_m), 2)*ssize)
-#sizes = np.power(sizes,0.5)
-legend_elements = [Line2D([0], [0], marker='_', color='w', label='140',markerfacecolor='gray', markersize=sizes[0], linestyle='None', markeredgecolor = 'darkgray'), #linewidth = 1.),
-                   Line2D([], [], marker='_', color='w', label='240',markerfacecolor='gray', markersize=sizes[1], linestyle='None', markeredgecolor = 'darkgray'),
-                   Line2D([], [], marker='_', color='w', label='340',markerfacecolor='gray', markersize=sizes[2], linestyle='None', markeredgecolor = 'darkgray'),
-                   Line2D([], [], marker='_', color='w', label='440',markerfacecolor='gray', markersize=sizes[3], linestyle='None', markeredgecolor = 'darkgray'),
-                   Line2D([], [], marker='_', color='w', label='',markerfacecolor='gray', markersize=0, linestyle='None'),
-                   Line2D([], [], marker='_', color='w', label='',markerfacecolor='gray', markersize=0, linestyle='None'),
+marker, scale = gen_arrow_head_marker(0)
+legend_elements = [Line2D([0], [0], marker=marker, color='w', label='140',markerfacecolor='gray', markersize=sizes[0], linestyle='None', markeredgecolor = 'darkgray'), #linewidth = 1.),
+                   Line2D([], [], marker=marker, color='w', label='240',markerfacecolor='gray', markersize=sizes[1], linestyle='None', markeredgecolor = 'darkgray'),
+                   Line2D([], [], marker=marker, color='w', label='340',markerfacecolor='gray', markersize=sizes[2], linestyle='None', markeredgecolor = 'darkgray'),
+                   Line2D([], [], marker=marker, color='w', label='440',markerfacecolor='gray', markersize=sizes[3], linestyle='None', markeredgecolor = 'darkgray'),
+                   Line2D([], [], marker=marker, color='w', label='',markerfacecolor='gray', markersize=0, linestyle='None'),
+                   Line2D([], [], marker=marker, color='w', label='',markerfacecolor='gray', markersize=0, linestyle='None'),
 ]
 
 lghd = ax_map.legend(handles=legend_elements, loc='lower right', framealpha = 0., title = r'P$_{\rm{mean}}$ [s]',borderpad = 1.2, prop={'size' : 8.}, labelspacing = 1.2)#, title_fontsize = 8.,markerscale = 0.5,borderpad = 0.15)
@@ -497,8 +553,8 @@ ytick_pos = np.arange(0,(np.round(yy/sc_fact))*sc_fact,sc_fact/2.)
 ytick_lab = np.round(ytick_pos*res).astype(int)
 xtick_pos = np.arange(0,(np.round(xx/sc_fact))*sc_fact,sc_fact/2.)
 xtick_lab = np.round(xtick_pos*res).astype(int)
-plt.show()
-stop()
+#plt.show()
+#stop()
 ax_map.set_xticks(xtick_pos)
 ax_map.set_xlim(0,xx)
 ax_map.set_ylim(0,yy)
