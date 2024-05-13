@@ -1,4 +1,3 @@
-# import modules
 import sparsetools as sp
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Cursor
@@ -124,30 +123,72 @@ rr = 40/1.5
 # the cross-correlation threshold 
 corr_thre = 0.5 # above which the oscillations are assumed to be (anti)correlated
 
-# Extract the oscillation objects
+for ii in range(len(file_search(fibdir,'crispex*3950*.csav'))):
+    print(ii, file_search(fibdir,'crispex*3950*.csav')[ii])
+cc = input("Enter the number of the cut: ")
 
-# User contribution to the specify the oscillation
-print('-----------------------------------------------------------------------------------------------------------------------')
-print('index                                  |dP|           Ppos_m       Ppos_dom       Plos_m       Plos_dom       P_corr')
-print('-----------------------------------------------------------------------------------------------------------------------')
-ind = 0
+cut_file = (file_search(fibdir,'crispex*3950*.csav'))[cc]
+cut = restore(fibdir+cut_file)
+cube_raw = np.mean(cut.loop_slab[w_pos-3:w_pos+3,:,:],axis = 0).squeeze()*1e9
 
-for iii in range(len(file_search(objdir, "cut*no0.obj"))):
-    cut_indx = file_search(objdir, "cut*no0.obj")[iii][3:9]
+# cleaning and sharpenning the intensity map
+wg = 0.15 # weight of the background intensity from the wings
+cube_bg = wg*np.mean(cut.loop_slab[:w_pos-6,:,:]+cut.loop_slab[w_pos+8:,:,:],axis=0).squeeze()*1e9
+cube_trunc = cube_raw - cube_bg # removing the background intensity
+# contrast correction
+cube_med = exposure.rescale_intensity(sgnl.medfilt2d(cube_trunc,kernel_size = [3,1]), out_range=(0, 1.))
+# sharpenning the maps alond the time axis to eliminate the jitters within frames
+cube_sharp = exposure.rescale_intensity(sharpen(cube_trunc, sigma =[3,1], unsigma = [1,3]), out_range=(0, 1.))
+# gamma correcting to enhance the intensity
+cube = exposure.rescale_intensity(exposure.adjust_gamma(cube_sharp,0.1), out_range=(0, 1.))
+wstd = 3 # weight of the standard deviation
+i_range = np.abs(wstd*np.std(cube)) # intensity range
+vmin, vmax = np.mean(cube)-i_range, np.mean(cube)+i_range#0.95, 0.99 # imshow intensity cropping range
+
+xx = cut.loop_slab.shape[2]
+
+# plotting settings
+fig = plt.figure(figsize = (8,9))
+gs = gridspec.GridSpec(2,1)
+ax1 = plt.subplot(gs[0,0])
+ax2 = plt.subplot(gs[1,0])
+
+# Intensity
+#------------
+ax1.imshow(np.transpose(cube),
+           cmap = 'gray', origin = 'lower', #aspect=ratio
+           #interpolation = 'bilinear',
+           vmin=vmin,
+           vmax = vmax,
+           aspect = 0.6,
+           )
+ax2.imshow(np.transpose(cube),
+           cmap = 'gray', origin = 'lower', #aspect=ratio
+           #interpolation = 'bilinear',
+           vmin=vmin,
+           vmax = vmax,
+           aspect = 0.6,
+           )
+
+for oo in range(len(file_search(outdir, "cut"+cut_file[-11:-5]+"*txt"))):
+
+    per_los = np.zeros(0)
+    per_pos = np.zeros(0)
+    osc_fname = outdir+file_search(outdir, "cut"+cut_file[-11:-5]+"*txt")[oo]
+    coord = np.loadtxt(osc_fname)
+    amin, amax = int(np.min(coord[:,0])), int(np.max(coord[:,0]))+1
+    tmin, tmax = int(np.min(coord[:,1])), int(np.max(coord[:,1]))+1
+    trange = np.linspace(tmin, tmax, tmax-tmin+1)
+    osc_fname_smth = outdir+"smth"+osc_fname[31:]
+    smth_y = np.loadtxt(osc_fname_smth)
     
-    # coords of the centere of oscillation
-    cut_file = (file_search(fibdir,'crispex*3950*'+cut_indx+'*.csav'))[0]
-    cut = restore(fibdir+cut_file)
-    cube = cut.loop_slab[w_pos,:,:]
-
-    for jjj in range(len(file_search(objdir, 'cut'+cut_indx+'*osc*.obj'))):
-        
-        per_los = np.zeros(0)
-        per_pos = np.zeros(0)
-    
-        osc_fname = outdir+file_search(outdir, "cut"+cut_file[-11:-5]+"*txt")[jjj]
-        coord = np.loadtxt(osc_fname)
-
+    ax1.plot(coord[:,1], coord[:,0],color = 'wheat', alpha = 0.5, label = 'Manual fit', linestyle = '--', linewidth = 1)
+    ax1.plot(trange, smth_y, color = 'orange', alpha = 0.5, label = r'smthd I$_{\rm{max}}$', linewidth = 2)
+    [y,x] = coord[0,:]
+    ax1.text(x,y,osc_fname[-10:-4], color = 'orange', fontdict = font)
+    plt.show()
+    ucheck = input("Accept oscillation path? ([y] / n)", default="y")
+    if ucheck =='y':
         # cut geometry
         x1 = cut.x_coords[0]
         x2 = cut.x_coords[1]
@@ -163,7 +204,6 @@ for iii in range(len(file_search(objdir, "cut*no0.obj"))):
         theta = np.rad2deg(np.arcsin(sinth))
         
         # on the FOV map
-        # sin = (y2-y1)/r = (yi-y1)/d
         d = np.mean(coord[:,0])
         yi = d*sinth + y1
         xi = d*costh + x1
@@ -265,51 +305,22 @@ for iii in range(len(file_search(objdir, "cut*no0.obj"))):
                                  , decimals = 1))
                 )'''
 
-                #ucheck = 1#input('1 or 0? ')
-                eps = 0.3 # percentage allowing the dP can be smaller than
-                if dp<eps*np.min([Ppos_m,Plos_m]):
-                    ucheck = 1
-                else:
-                    ucheck = 0
-                if ucheck==1:
+                ucheck2 = input('Still yes? ([1] / 0)', default = 1)
+                if ucheck2==1:
                     dphi = lag[np.argmax(ncc)]/per_dom
-                    #if (dphi_one>1):
-                        #dphi_one = 2 - dphi_one
-                    #if (dphi_one<0):
-                    #   dphi_one = 2+dphi_one
-                if ucheck==0:
+                if ucheck2==0:
                     dphi = -5
                     
             elif (np.min(ncc)<-corr_thre
                   and np.abs(lag[np.argmin(ncc)])<=per_dom
                   and np.max(ncc)<np.abs(np.min(ncc))):
-                #test = np.abs(np.diff(lag[extrem(ncc, np.less)]))[np.argmin(np.abs(np.diff(lag[extrem(ncc, np.less)])) - per_dom)],#]),
+
                 ind = ind+1
 
                 P_cor = np.abs(lag[np.argmin(ncc)])
-                '''
-                print(
-                    str(ind)+')'+
-                    osc_fname[31:-4]+ '          ' +
-                    str(dp) + '          ' +
-                    #str(dp_dom) + '          ' +
-                    str(np.round(Ppos_m, decimals = 1)) + '          ' +
-                    str(np.round(Ppos_dom, decimals = 1)) + '          ' +
-                    str(np.round(Plos_m, decimals = 1))+ '          ' +
-                    str(np.round(Plos_dom, decimals = 1)) + '          ' +
-                    str(np.round(P_cor
-                                 , decimals = 1))
-                )'''
-                #str(np.round(dp*100/np.mean([Ppos_m, Plos_m]))))# + '%Ppos' + ' = ' + str(np.round(dp*100/Plos_m)) + '%Plos')
-                #print('Plos = ', per_pos_one)
-                #print('Ppos = ', per_los_one)
-
-                #ucheck = 1#input('1 or 0? ')
-                if dp<eps*np.min([Ppos_m,Plos_m]):
-                    ucheck = 1
-                else:
-                    ucheck = 0
-                if ucheck==1:
+                
+                ucheck2 = input('Still yes? ([1] / 0)', default = 1)
+                if ucheck2==1:
                     dphi = lag[np.argmin(ncc)]/per_dom
                     #if (dphi_one<0):
                     #   dphi_one = 2+dphi_one
@@ -321,8 +332,7 @@ for iii in range(len(file_search(objdir, "cut*no0.obj"))):
         else:
             dphi = -10
             per_m = 0
-            #print(osc_fname)#len(osc.los_ymin), len(osc.los_ymax), len(osc.pos_ymin), len(osc.pos_ymax))
-            #stop()
+
         ################
         # filling in the result object
         ################
@@ -351,13 +361,12 @@ for iii in range(len(file_search(objdir, "cut*no0.obj"))):
                                     )
         objresname = objresdir + 'result' + osc_fname[-30:-4] + "-no"+ str(jjj)+ ".obj"
         save_obj(objresname, result)
-
-        # color coding the scatter plot
-        #if (np.abs(np.min(ncc))>np.max(ncc)):
-         #   cor_rate = np.append(cor_rate, np.min(ncc))
         
-        #if (np.abs(np.min(ncc))<=np.max(ncc)):
-         #   mid_coord_x = np.append(mid_coord_x, mid_coord[0])
-          #  mid_coord_y = np.append(mid_coord_y, mid_coord[1])
-           # cor_rate = np.append(cor_rate, np.max(ncc))
+    else:
+        ucheck3 = input('delete the oscillation? ([NO!] / yes)', default = 'NO!')
+        if ucheck3=='NO!':
+            print('ok ;)')
+        if ucheck=='yes':
             
+    stop()
+
