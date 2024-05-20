@@ -139,17 +139,13 @@ files = file_search(fibdir,'crispex*3950*.csav')
 for ii in range(len(files)):
     print(ii, files[ii])
 i0 = input("Enter the number of the cut: ")
-
 for i in range(i0,len(files)):
 
-    ax1.clear()
-    ax2.clear()
-    ax3.clear()
-        
     cut_file = files[i]
     cut = restore(fibdir+cut_file)
     cube_raw = np.mean(cut.loop_slab[w_pos-3:w_pos+3,:,:],axis = 0).squeeze()*1e9
-    
+    oscils = file_search(outdir, "cut"+cut_file[-11:-5]+"*txt")
+
     # cleaning and sharpenning the intensity map
     wg = 0.15 # weight of the background intensity from the wings
     cube_bg = wg*np.mean(cut.loop_slab[:w_pos-6,:,:]+cut.loop_slab[w_pos+8:,:,:],axis=0).squeeze()*1e9
@@ -166,7 +162,14 @@ for i in range(i0,len(files)):
     vmin, vmax = np.mean(cube)-i_range, np.mean(cube)+i_range#0.95, 0.99 # imshow intensity cropping range
     vmin2,vmax2 = np.mean(cube)-i_range2, np.mean(cube)+i_range2
     xx = cut.loop_slab.shape[2]
-    
+
+    ax1.clear()
+    ax2.clear()
+    ax3.clear()
+    ax4.clear()
+    ax5.clear()
+    ax6.clear()
+
     # Intensity
     #------------
     ax1.imshow(np.transpose(cube),
@@ -190,12 +193,17 @@ for i in range(i0,len(files)):
                vmax = vmax2,
                aspect = 0.6,
                )
-    
-    for oo in range(0,len(file_search(outdir, "cut"+cut_file[-11:-5]+"*txt"))):
+
+    oo = 0
+    for oo in range(0,len(oscils)):
+        print ([oo,(oscils[oo])[-10:-4]])
+    o0 = raw_input(str(i)+"-cut"+cut_file[-11:-5]+": start from oscillation no: (default=0) ").strip() or '0'
+    o0 = int(o0)
+    for o in range(int(o0),len(oscils)):
         
         per_los = np.zeros(0)
         per_pos = np.zeros(0)
-        osc_fname = outdir+file_search(outdir, "cut"+cut_file[-11:-5]+"*txt")[oo]
+        osc_fname = outdir+oscils[o]
         print("==========================================")
         print(" OSCILLATION: " + osc_fname[31:-4] + " ")
         print("==========================================")
@@ -216,16 +224,23 @@ for i in range(i0,len(files)):
         # plots for sanity check
         #------------------------------
         plt.title(osc_fname[31:-4])
+        # clearing the subplots
         ax4.clear()
         ax5.clear()
         ax6.clear()
+        if o>o0:
+            (over3.pop(0)).remove()
+            (over2.pop(0)).remove()
         
         # intensity plots
         ax1.set_title(osc_fname[-10:-4])
         ax1.plot(coord[:,1], coord[:,0],color = 'wheat', alpha = 0.5, label = 'Manual fit', linestyle = '--', linewidth = 1)
         ax1.plot(trange, smth_y, color = 'orangered', alpha = 0.5, label = r'smthd I$_{\rm{max}}$', linewidth = 2)
+        over2 = ax2.plot([trange[0], trange[-1]], [smth_y[0], smth_y[-1]], 'r.', alpha = 0.5)
+        over3 = ax3.plot([trange[0], trange[-1]], [smth_y[0], smth_y[-1]], 'r.', alpha = 0.5)
         [y,x] = coord[0,:]
         ax1.text(x,y,osc_fname[-10:-4], color = 'orangered')
+        
         
         # plot LOS and POS
         ax4.axhline(0, linestyle = ":", color = "gray", linewidth = 1, alpha = 0.5)
