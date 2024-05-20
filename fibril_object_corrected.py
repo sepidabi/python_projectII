@@ -76,6 +76,7 @@ class oscillation_result:
                  dphi,
                  ncc_min,
                  ncc_max,
+                 ncc,
                  mid_coord,
                  cor_rate,
                  theta,
@@ -96,6 +97,7 @@ class oscillation_result:
         self.dphi = dphi
         self.ncc_min = ncc_min
         self.ncc_max =  ncc_max
+        self.ncc =  ncc
         self.mid_coord = mid_coord
         self.cor_rate = cor_rate
         self.theta = theta
@@ -265,12 +267,12 @@ for iii in range(len(file_search(objdir, "cut*no0.obj"))):
                                  , decimals = 1))
                 )'''
 
-                #ucheck = 1#input('1 or 0? ')
-                eps = 0.3 # percentage allowing the dP can be smaller than
-                if dp<eps*np.min([Ppos_m,Plos_m]):
-                    ucheck = 1
-                else:
-                    ucheck = 0
+                ucheck = 1#input('1 or 0? ')
+                #eps = 0.3 # percentage allowing the dP can be smaller than
+                #if dp<eps*np.min([Ppos_m,Plos_m]):
+                  #  ucheck = 1
+                #else:
+                  #  ucheck = 0
                 if ucheck==1:
                     dphi = lag[np.argmax(ncc)]/per_dom
                     #if (dphi_one>1):
@@ -304,11 +306,11 @@ for iii in range(len(file_search(objdir, "cut*no0.obj"))):
                 #print('Plos = ', per_pos_one)
                 #print('Ppos = ', per_los_one)
 
-                #ucheck = 1#input('1 or 0? ')
-                if dp<eps*np.min([Ppos_m,Plos_m]):
-                    ucheck = 1
-                else:
-                    ucheck = 0
+                ucheck = 1#input('1 or 0? ')
+                #if dp<eps*np.min([Ppos_m,Plos_m]):
+                  #  ucheck = 1
+                #else:
+                  #  ucheck = 0
                 if ucheck==1:
                     dphi = lag[np.argmin(ncc)]/per_dom
                     #if (dphi_one<0):
@@ -341,6 +343,7 @@ for iii in range(len(file_search(objdir, "cut*no0.obj"))):
                                     dphi,
                                     ncc_min,
                                     ncc_max,
+                                    ncc,
                                     mid_coord,
                                     cor_rate,
                                     theta,
