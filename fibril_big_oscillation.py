@@ -104,7 +104,9 @@ cube_sharp = exposure.rescale_intensity(sharpen(cube_trunc, sigma =[3,1], unsigm
 
 cube = exposure.rescale_intensity(exposure.adjust_gamma(cube_sharp,0.1), out_range=(0, 1.))
 
-vmin, vmax = 0.95, 0.99
+cube_std = np.std(cube)
+fact = 1.5
+vmin, vmax = np.mean(cube) - fact*cube_std, np.mean(cube) + fact*cube_std
 
 xx = cut.loop_slab.shape[2]
 
@@ -121,7 +123,7 @@ xtick_pos = np.arange(0,(np.round((xx)/rr)+1)*rr,rr)
 xtick_lab = np.intc(np.round(xtick_pos*res, decimals = 0))
 
 # Extracting the inversion results
-inv_inc=input("include inversion results [0 or 1]? ")
+inv_inc=raw_input("include inversion results [default=0 or 1]? ").strip() or 0
 if(inv_inc):
     inv_res = sp.model(invdir+
                        file_search(invdir, "*atmosout*"+cut_file[-11:-5]+"*nc")[0])
@@ -159,7 +161,7 @@ if(0):
 
     
 # tracking mode
-track = input("Tracking on? (0 or 1): ")
+track = raw_input("Tracking on? [0 or default=1]: ").strip() or 1
 
 if(track==1):
     ########################
@@ -222,7 +224,7 @@ if(track==1):
         np.savetxt(osc_fname, coord, fmt='%3.8f', delimiter=' ', newline='\n', header='a(t) [pixel], t [fr]', footer='', comments='# ', encoding=None)
         coord = []
 
-        c = input("Still tracking? (0 or 1): ")
+        c = raw_input("Still tracking? [0 or default=1]: ").strip() or 1
         
         if c==0:
             break
