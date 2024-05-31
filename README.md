@@ -3,7 +3,7 @@ THIS REPOSITORY INCLUDES (for now) THE PYTHON SCRIPTS THAT I AM WRITING FOR MY S
 
 >Note: We assume here that the cuts across the fibrils have already been defined via crispex. So we are picking up from there. Also the inversions on the space-time intensity maps of the cuts have been done and stored
 
-##__fibril_big_oscillation.py:__ A user interactive code to trace the priliminary path of the fibrillar oscillations
+## __ fibril_big_oscillation.py: __ A user interactive code to trace the priliminary path of the fibrillar oscillations
 1- The time vs. intensity image along the each cut (defined by user) get extracted and enhaced to bring out the oscillations.
 2- User clicks along the path of of each oscillation
 3- The coords of the traced path and smoothed path is saved in .txt format
