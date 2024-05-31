@@ -22,8 +22,7 @@ Note: We assume here that the cuts across the fibrils have already been defined 
 > Note: no oscillation at this point is excluded and the characteristics that are saved are purely calculated
 
 # The class under which each object assigned to each oscillation follows as:
-
-class oscillation:
+>class oscillation:
     def __init__(self, time, vpos_f, vlos_f, ncc_pos, ncc_los, pos_xmax, pos_ymax, pos_xmin, pos_ymin, pos_ncc_xmax, pos_ncc_ymax, los_xmax, los_ymax, los_xmin, los_ymin, los_ncc_xmax, los_ncc_ymax, osc_mid_coord, phase, osc_cat):
         self.time = time
         self.vpos_f = vpos_f
@@ -45,3 +44,41 @@ class oscillation:
         self.osc_mid_coord = osc_mid_coord
         self.phase = phase
         self.osc_cat = osc_cat
+
+###fibril_object_corrected.py
+#checks the oscillations automatically and excludes the ones that are not acceptable and saves the results in new object format
+1- Extract the objects save by "object_oscillation_properties.py" and check if
+   - the oscillation is valid
+   - if there is oscillation in los direction
+   - if the oscillation in los and pos in each case are correlated
+2- the oscillations info such as Period, phase and amplitude in new object class as following:
+>class oscillation_result:
+    def __init__(self,
+                 per_los,
+                 per_los_m,
+                 per_los_dom,
+                 per_pos,
+                 per_pos_m,
+                 per_pos_dom,
+                 A_los_m,
+                 A_pos_m,
+                 dphi,
+                 ncc_min,
+                 ncc_max,
+                 ncc,
+                 mid_coord,
+                 cor_rate,
+                 theta,
+                 per_m,
+                 per_dom,
+                 ratio,
+                 dist,
+                 ):
+
+###fibril_oscillation_final_check.py
+#Provides the chance to visually inspect the traced fibrils to make sure that the automatic judjemt in oscillations validity is actually correct
+1- Move the files corresponding to the oscillations that were not subjectively acceptable, to the "removed_oscillations" folder
+
+###fibril_object_results.py
+#plot the results
+
