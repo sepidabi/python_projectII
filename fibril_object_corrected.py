@@ -134,15 +134,15 @@ print('index                                  |dP|           Ppos_m       Ppos_d
 print('-----------------------------------------------------------------------------------------------------------------------')
 ind = 0
 
-for iii in range(len(file_search(objdir, "cut*no0.obj"))):
-    cut_indx = file_search(objdir, "cut*no0.obj")[iii][3:9]
+for iii in range(len(file_search(fibdir,'crispex*3950*.csav'))):
+    cut_indx = file_search(fibdir,'crispex*3950*.csav')[iii][-11:-5]
     
     # coords of the centere of oscillation
     cut_file = (file_search(fibdir,'crispex*3950*'+cut_indx+'*.csav'))[0]
     cut = restore(fibdir+cut_file)
     cube = cut.loop_slab[w_pos,:,:]
 
-    for jjj in range(len(file_search(objdir, 'cut'+cut_indx+'*osc*.obj'))):
+    for jjj in range(len(file_search(outdir, "cut"+cut_file[-11:-5]+"*txt"))):
         
         per_los = np.zeros(0)
         per_pos = np.zeros(0)
@@ -170,8 +170,8 @@ for iii in range(len(file_search(objdir, "cut*no0.obj"))):
         yi = d*sinth + y1
         xi = d*costh + x1
         mid_coord = np.array([xi,yi])
-        osc_indx = str(jjj)
-        osc_obj = (file_search(objdir, "cut*"+cut_indx+"*-no"+osc_indx+".obj"))[0]
+        osc_indx = file_search(outdir, "cut"+cut_file[-11:-5]+"*txt")[jjj][13:-4]#str(jjj)
+        osc_obj = (file_search(objdir, "cut*"+cut_indx+"*"+osc_indx+"*.obj"))[0]
         osc = load_obj(objdir+osc_obj)
         # categorization
         vpos_f = osc.vpos_f
@@ -352,7 +352,7 @@ for iii in range(len(file_search(objdir, "cut*no0.obj"))):
                                     ratio,
                                     dist,
                                     )
-        objresname = objresdir + 'result' + osc_fname[-30:-4] + "-no"+ str(jjj)+ ".obj"
+        objresname = objresdir + 'result' + osc_fname[-30:-4]+ ".obj"
         save_obj(objresname, result)
 
         # color coding the scatter plot
