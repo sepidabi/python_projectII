@@ -210,9 +210,9 @@ for i in range(i0,len(files)):
         coord = np.loadtxt(osc_fname)
         
         # Extract the oscillation objects
-        obj_name = file_search(objdir, '*' + osc_fname[-30:-4]+"*.obj")[0]
+        obj_name = file_search(objdir, osc_fname[-30:-4]+"*.obj")[0]
         obj = load_obj(objdir + obj_name)
-        objres_name = file_search(objresdir, '*' + osc_fname[-30:-4]+"*.obj")[0]
+        objres_name = file_search(objresdir, 'result' + osc_fname[-30:-4]+"*.obj")[0]
         objres = load_obj(objresdir + objres_name)
         
         #amin, amax = int(np.min(coord[:,0])), int(np.max(coord[:,0]))+1
@@ -270,8 +270,15 @@ for i in range(i0,len(files)):
         if ucheck1=='n':
             ucheck2 = raw_input('Delete the oscillation ([NO!] / yes)? ').strip() or "NO!"
             if ucheck2=='NO!':
-                print('ok then ;) We should probably redefine the oscillation path.')
-                #stop()
+                ucheck3 = raw_input('ok then ;) Shall we redefine the dphi? (y / [n])').strip() or "n"
+                if ucheck3=='y':
+                    print('Changing the dphi value from '+str(objres.dphi) + ' to:')
+                    objres.dphi = input('Enter the new value: ')
+                    save_obj(objresdir + objres_name, objres)
+                if ucheck3=='n':
+                    print('So nothing was changed...')
+                    stop()
+                    
             if ucheck2=='yes':
                 os.system('mv -v '+objresdir+'*'+osc_fname[-30:-4]+'* '+removedir)
                 os.system('mv -v '+outdir+'*'+osc_fname[-30:-4]+'* '+removedir)
