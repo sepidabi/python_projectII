@@ -61,5 +61,6 @@ The purpose of this script is to:
 - ensure that the oscillations have defined dphi [-1,1] or -5, also have convincing oscillations path 
 > The oscillations that were not subjectively acceptable, to the "removed_oscillations" folder
 
-## fibril_object_results.py: plots the results
+## fibril_object_results.py: plots the statistical anlysis results
 
+## fibril_proto_plot.py: plots the proto-oscillations (examples of the categories)

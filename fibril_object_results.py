@@ -53,7 +53,7 @@ def gen_arrow_head_marker(rot):
         with the same size independent of their rotation.
         Paths are autoscaled to a box of size -1 <= x, y <= 1 by plt.scatter
     """
-    arr = np.array([[0, 0], [.2, -.9], [-.2, -.9], [0, 0]])  # arrow shape
+    arr = np.array([[0, 0], [-.9,.2], [-.9, -.2], [0, 0]])  # arrow shape
     angle = rot / 180 * np.pi
     rot_mat = np.array([
         [np.cos(angle), np.sin(angle)],
@@ -409,7 +409,7 @@ plt.subplots_adjust(left = 0.06,
                     wspace = 0.2,
                     hspace = 0.2
 )
-plt.show()
+#plt.show()
 #
 filename = outdir + 'analys_tot.pdf'
 fig.savefig(filename, dpi = 1000)
@@ -435,34 +435,37 @@ fifi = plt.figure(figsize = (4,3))
 #gs = gridspec.GridSpec(ncols = 1,nrows = 1, figure = fifi)
 #axfi = fig.add_subplot(gs[0,0])
 axfi = plt.subplot(111)#, projection='polar')
-n, bins, patches  = axfi.hist(dphi[(dphi>=-1)], bins = 14, edgecolor='white', linewidth=1., color = 'orangered', alpha = 0.5, range = [-1,1])
+n, bins, patches  = axfi.hist(dphi[(dphi>=-1)], bins = 15, edgecolor='white', linewidth=1., color = 'orangered', alpha = 0.5, range = [-1,1])
 bin_centers = 0.5 * (bins[:-1] + bins[1:])
 axfi.tick_params(axis = 'both', labelsize = 8.)
 axfi.set_xlabel(r'$\Delta \phi$ [rad]', fontdict = font)
-axfi.set_ylabel(r'Number of oscillation cases', fontdict = font)
+axfi.set_ylabel(r'# of oscillation cases', fontdict = font)
 axfi.set_xticks([-1,-.75, -.5, -.25, 0,0.25,0.5,0.75,1])
 axfi.set_xticklabels([r'-$\pi$', r'-3$\pi$/4', r'-$\pi$/2', r'-$\pi$/4', r'0', r'$\pi$/4', r'$\pi$/2', r'3$\pi$/4', r'$\pi$'], fontdict = font)
-axfi.set_yticks([0,3,6,9,12,15])
-axfi.set_ylim(0,16)
-axfi.yaxis.set_minor_locator(AutoMinorLocator(3))
+#axfi.set_yticks([0,3,6,9,12,15])
+axfi.set_ylim(0,100)
+axfi.set_xlim(-1.05,1.05)
+axfi.yaxis.set_minor_locator(AutoMinorLocator(2))
 
-axins = inset_axes(axfi, width=1.2, height=.91,
-                    bbox_to_anchor=(0.62, 0.57),
+axins = inset_axes(axfi, width=1.1, height=.91,
+                    bbox_to_anchor=(0.64, 0.57),
                     bbox_transform=axfi.transAxes, loc=3, borderpad=0)
 
 nn, bbins, ppatches = axins.hist(np.abs(dphi[(dphi>=-1)]), bins = 7, range = [0,1], edgecolor = 'white', linewidth = 1., color = 'orangered', alpha = 0.5)
 axins.tick_params(axis = 'both', labelsize = 8.)
 axins.set_xlabel(r'|$\Delta \phi$| [rad]', fontdict = font)
 #axins.set_ylabel(r'Number of oscillation cases', fontdict = font)
-axins.set_yticks([0,5,10,15])
+#axins.set_yticks([0,5,10,15])
 axins.set_xticks([0,0.5,1])
+axins.set_xlim(-.05,1.05)
 axins.set_xticklabels([r'0', r'$\pi$/2', r'$\pi$'], fontdict = font)
 #axins.yaxis.set_minor_locator(AutoMinorLocator(2))
 
 plt.tight_layout()
 filename = outdir + 'analys_dphi.pdf'
-plt.show()
+#plt.show()
 fifi.savefig(filename, dpi = 1000)
+#stop()
 #
 plt.close(fifi)
 
@@ -481,7 +484,7 @@ plt.close(fifi)
 # SCATTER PLOT
 #==========
 cor_rate = dphi
-ssize = 300
+ssize = 900.
 # RoI coords
 x1, x2, y1, y2 = 425, 900, 400, 1110
 xx, yy = x2-x1, y2-y1
@@ -496,33 +499,34 @@ ax_map.contourf(np.abs(CPtot[y1:y2, x1:x2]).squeeze()*1e2, cmap = 'Blues', alpha
 contour = ax_map.contour(np.abs(CPtot[y1:y2, x1:x2]).squeeze()*1e2, colors = ['white', 'white'], alpha = 0.5, levels = c_levels, linewidths = [0.5,0.5])
 #common_style = {k: v for k, v in filled_marker_style.items() if k != 'marker'}
 for i in range (len(mid_coord_x)):
-    marker, scale = gen_arrow_head_marker(theta[i])
-    markersize = np.power(per_m[i]/np.max(per_m), 2)*ssize
+    marker, scale = gen_arrow_head_marker(90+theta[i])
+    #marker = (3, 0, theta[i])
+    markersize = np.power(per_m/np.max(per_m), 2)*ssize
     if (dphi[i]>=-1):
-        sc = ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, c = np.abs(cor_rate[i]), marker=marker, cmap = cmap_phi, s = per_m[i], alpha = 0.6, vmin =0, vmax = 1)
+        sc = ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, c = np.abs(cor_rate[i]), marker=marker, cmap = cmap_phi, s = markersize[i], alpha = 0.45, vmin =0, vmax = 1)
         dist_i = np.sqrt(contour.find_nearest_contour(mid_coord_x[i]-x1, mid_coord_y[i]-y1)[5])
         dist = np.append(dist, dist_i)
         ratio = np.append(ratio,dist_i/per_m[i])
         #print(np.power(per_m[i]/np.max(per_m), 2)*ssize)
 
-    elif (dphi[i]==-5):
-        ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, marker=marker , s = markersize, alpha = 0.6, color = 'gray')
+    #elif (dphi[i]==-5):
+        #ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, marker=marker , s = markersize, alpha = 0.6, color = 'gray')
         #dist_i = np.sqrt(contour.find_nearest_contour(mid_coord_x[i]-x1, mid_coord_y[i]-y1)[5])
         #dist = np.append(dist, dist_i)
         #ratio = np.append(ratio,dist_i/per_m[i])
-    else:
-        ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, marker='.' , s = 10, alpha = 0.6, color = 'white')
+    #else:
+        #ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, marker='.' , s = 10, alpha = 0.6, color = 'white')
         #print('-',mid_coord_x[i],mid_coord_y[i],dphi[i])
-plt.show()
+#plt.show()
 #
 #ax_map.scatter(x=100,  y = 100, marker = (3,0,0), s = np.power(140/np.max(per_m), 2)*ssize)
-hands =np.array([120,240,340,440.])
+hands =np.array([120,230,340,450])
 sizes = np.sqrt(np.power(hands/np.max(per_m), 2)*ssize)
 marker, scale = gen_arrow_head_marker(0)
-legend_elements = [Line2D([0], [0], marker=marker, color='w', label='140',markerfacecolor='gray', markersize=sizes[0], linestyle='None', markeredgecolor = 'darkgray'), #linewidth = 1.),
-                   Line2D([], [], marker=marker, color='w', label='240',markerfacecolor='gray', markersize=sizes[1], linestyle='None', markeredgecolor = 'darkgray'),
-                   Line2D([], [], marker=marker, color='w', label='340',markerfacecolor='gray', markersize=sizes[2], linestyle='None', markeredgecolor = 'darkgray'),
-                   Line2D([], [], marker=marker, color='w', label='440',markerfacecolor='gray', markersize=sizes[3], linestyle='None', markeredgecolor = 'darkgray'),
+legend_elements = [Line2D([0], [0], marker=marker, color='w', label=str(hands[0]),markerfacecolor='gray', markersize=sizes[0], linestyle='None', markeredgecolor = 'darkgray'), #linewidth = 1.),
+                   Line2D([], [], marker=marker, color='w', label=str(hands[1]),markerfacecolor='gray', markersize=sizes[1], linestyle='None', markeredgecolor = 'darkgray'),
+                   Line2D([], [], marker=marker, color='w', label=str(hands[2]),markerfacecolor='gray', markersize=sizes[2], linestyle='None', markeredgecolor = 'darkgray'),
+                   Line2D([], [], marker=marker, color='w', label=str(hands[3]),markerfacecolor='gray', markersize=sizes[3], linestyle='None', markeredgecolor = 'darkgray'),
                    Line2D([], [], marker=marker, color='w', label='',markerfacecolor='gray', markersize=0, linestyle='None'),
                    Line2D([], [], marker=marker, color='w', label='',markerfacecolor='gray', markersize=0, linestyle='None'),
 ]
@@ -578,8 +582,8 @@ gs_map.update(left=0.115,
 filename = outdir + 'analys_fibril_coords.pdf'
 map_cak.savefig(filename, dpi = 1000)
 print('file saved to: '+ filename)
-plt.show()
-stop()
+#plt.show()
+#stop()
 
 # fibril didstance and period correlation
 plt.figure()
@@ -596,7 +600,7 @@ plt.title('corr. fibril d. from mag. patch \nvs. avg. osc. period')
 slope = (p(dist/ratio)[-1]-p(dist/ratio)[0])/(dist[-1]/ratio[-1]-dist[0]/ratio[0])
 plt.text(270,250,'D = '+str(np.round(slope, decimals = 1))+'*P')
 
-plt.show()
+#plt.show()
 
 
 plt.close(map_cak)
@@ -615,34 +619,38 @@ xy = np.linspace(-0,1000,100)
 
 plt.close('all')
 fig = plt.figure(figsize = (4,4))
-bins = 50
+bins = 30
 gs = gridspec.GridSpec(ncols = 5,nrows = 5)
 
 ax_joint = fig.add_subplot(gs[1:5,0:4])
 ax_marg_x = fig.add_subplot(gs[0,0:4])
 ax_marg_y = fig.add_subplot(gs[1:5,4])
 
-xmin, ymin = 80, 80
-xmax, ymax = 550, 550
-
 # Period
-x = per_pos_m
-y = per_los_m
+x = per_pos_m[np.where(dphi>=-1)]
+y = per_los_m[np.where(dphi>=-1)]
 
+rmin = 70#np.min([x,y])
+rmax = np.max([x,y])
 
 angle = 90.-(np.arctan((ymax-ymin)/float(xmax-xmin))*360./(2*np.pi))
 ax_joint.plot(xy,xy,alpha = 0.5, color = 'black', linewidth = 1., linestyle = '--')#, linestyle = '--')
 ax_joint.text(xmax - 60,ymax - 55,'y = x', alpha = 0.5, color = 'black', rotation = angle, fontsize = 8)
 
-ax_joint.scatter(x, y, alpha = 0.25, color = 'orangered')
-ax_marg_x.hist(x, color = 'orangered', rwidth = 0.95, alpha = 0.5, bins = bins)
-ax_marg_y.hist(y,orientation="horizontal", color = 'orangered', alpha = 0.5, rwidth = 0.95, bins = bins)
+cmapc = mpl.colors.LinearSegmentedColormap.from_list("", ["white","orangered"])
+#ax_joint.scatter(x, y, alpha = 0.25, color = 'orangered')
+#ax_joint.hist2d(x, y, bins = bins, cmap = cmapc)
+sns.kdeplot(x,y, cmap = 'Reds', ax = ax_joint, shade = True)
+sns.kdeplot(y, ax = ax_marg_y, shade=True, color = 'orangered', vertical = True)
+sns.kdeplot(x, ax = ax_marg_x, shade=True, color = 'orangered')
+#ax_marg_x.hist(x, color = 'orangered', rwidth = 0.95, alpha = 0.5, bins = bins)
+#ax_marg_y.hist(y,orientation="horizontal", color = 'orangered', alpha = 0.5, rwidth = 0.95, bins = bins)
 
 # Set ax limits on marginals
-ax_joint.set_xlim([xmin,xmax])
-ax_joint.set_ylim([ymin,ymax])
-ax_marg_y.set_ylim([ymin,ymax])
-ax_marg_x.set_xlim([xmin,xmax])
+ax_joint.set_xlim([rmin,rmax])
+ax_joint.set_ylim([rmin,rmax])
+ax_marg_y.set_ylim([rmin,rmax])
+ax_marg_x.set_xlim([rmin,rmax])
 
 pearsonr = str(np.round(stat.pearsonr(x, y)[0],decimals = 2))
 pearsonp = str(np.int(stat.pearsonr(x, y)[1]))
@@ -671,8 +679,8 @@ ax_joint.spines['top'].set_visible(False)
 ax_joint.spines['right'].set_visible(False)
 
 # Set labels on joint
-ax_joint.set_xlabel(r' $\overline{P}_{\rm{POS}}$ s]', fontdict = font)
-ax_joint.set_ylabel(r' $\overline{P}_{\rm{LOS}}$ s]', fontdict = font)
+ax_joint.set_xlabel(r' $\overline{P}_{\rm{POS}}$ [s]', fontdict = font)
+ax_joint.set_ylabel(r' $\overline{P}_{\rm{LOS}}$ [s]', fontdict = font)
 ax_joint.tick_params(labelsize = fontsize)
 ax_marg_x.tick_params(labelsize = fontsize)
 ax_marg_y.tick_params(labelsize = fontsize)
@@ -687,7 +695,8 @@ plt.subplots_adjust(left = 0.14,
 
 filename = outdir + 'analys_pp.pdf'
 fig.savefig(filename, dpi = 1000)
-
+plt.show()
+stop()
 
 # Amplitude PLOT
 # ==========
@@ -703,27 +712,29 @@ ax_joint = fig.add_subplot(gs[1:5,0:4])
 ax_marg_x = fig.add_subplot(gs[0,0:4])
 ax_marg_y = fig.add_subplot(gs[1:5,4])
 
-xmin, ymin = 0,0
-xmax, ymax = 5.5,5.5
-
 # Amplitude
-x = A_pos_m
-y = A_los_m
+x = A_pos_m[np.where(dphi>=-1)]
+y = A_los_m[np.where(dphi>=-1)]
 
+rmin = 0#np.min([x,y])
+rmax = 3.5#np.max([x,y])
 
 angle = 90.-(np.arctan((ymax-ymin)/float(xmax-xmin))*360./(2*np.pi))
 ax_joint.plot(xy,xy,alpha = 0.5, color = 'black', linewidth = 1., linestyle = '--')#, linestyle = '--')
 ax_joint.text(xmax - 0.6,ymax - 0.55,'y = x', alpha = 0.5, color = 'black', rotation = angle, fontsize = 8)
 
-ax_joint.scatter(x, y, alpha = 0.25, color = 'orangered')
-ax_marg_x.hist(x, color = 'orangered', rwidth = 0.95, alpha = 0.5, bins = bins)
-ax_marg_y.hist(y,orientation="horizontal", color = 'orangered', alpha = 0.5, rwidth = 0.95, bins = bins/3)
+#ax_joint.scatter(x, y, alpha = 0.25, color = 'orangered')
+#ax_marg_x.hist(x, color = 'orangered', rwidth = 0.95, alpha = 0.5, bins = bins)
+#ax_marg_y.hist(y,orientation="horizontal", color = 'orangered', alpha = 0.5, rwidth = 0.95, bins = bins/3)
+sns.kdeplot(x,y, cmap = 'Reds', ax = ax_joint, shade = True)
+sns.kdeplot(y, ax = ax_marg_y, shade=True, color = 'orangered', vertical = True)
+sns.kdeplot(x, ax = ax_marg_x, shade=True, color = 'orangered')
 
 # Set ax limits on marginals
-ax_joint.set_xlim([xmin,xmax])
-ax_joint.set_ylim([ymin,ymax])
-ax_marg_y.set_ylim([ymin,ymax])
-ax_marg_x.set_xlim([xmin,xmax])
+ax_joint.set_xlim([rmin,rmax])
+ax_joint.set_ylim([rmin,rmax])
+ax_marg_y.set_ylim([rmin,rmax])
+ax_marg_x.set_xlim([rmin,rmax])
 
 pearsonr = str(np.round(stat.pearsonr(x, y)[0],decimals = 2))
 pearsonp = str(np.int(stat.pearsonr(x, y)[1]))
@@ -768,7 +779,8 @@ plt.subplots_adjust(left = 0.14,
 
 filename = outdir + 'analys_AA.pdf'
 fig.savefig(filename, dpi = 1000)
-
+#plt.show()
+#stop()
 
 # POS PLOT
 # ======
@@ -784,21 +796,25 @@ ax_joint = fig.add_subplot(gs[1:5,0:4])
 ax_marg_x = fig.add_subplot(gs[0,0:4])
 ax_marg_y = fig.add_subplot(gs[1:5,4])
 
-xmin, ymin = 100,0
-xmax, ymax = 550,5.5
-
 # POS
-x = per_pos_m
-y = A_pos_m
+x = per_pos_m[np.where(dphi>=-5)]
+y = A_pos_m[np.where(dphi>=-5)]
+
+xmin, ymin = 75, 0.13
+xmax, ymax = 500,2.5
 
 
 #angle = 90.-(np.arctan((ymax-ymin)/float(xmax-xmin))*360./(2*np.pi))
 #ax_joint.plot(xy,xy,alpha = 0.5, color = 'black', linewidth = 1., linestyle = '--')#, linestyle = '--')
 #ax_joint.text(xmax - 60,ymax - 0.55,'y = x', alpha = 0.5, color = 'black', rotation = angle, fontsize = 8)
 
-ax_joint.scatter(x, y, alpha = 0.25, color = 'orangered')
-ax_marg_x.hist(x, color = 'orangered', rwidth = 0.95, alpha = 0.5, bins = bins)
-ax_marg_y.hist(y,orientation="horizontal", color = 'orangered', alpha = 0.5, rwidth = 0.95, bins = bins)
+#ax_joint.scatter(x, y, alpha = 0.25, color = 'orangered')
+#ax_marg_x.hist(x, color = 'orangered', rwidth = 0.95, alpha = 0.5, bins = bins)
+#ax_marg_y.hist(y,orientation="horizontal", color = 'orangered', alpha = 0.5, rwidth = 0.95, bins = bins)
+sns.kdeplot(x,y, cmap = 'Reds', ax = ax_joint, shade = True)
+sns.kdeplot(y, ax = ax_marg_y, shade=True, color = 'orangered', vertical = True)
+sns.kdeplot(x, ax = ax_marg_x, shade=True, color = 'orangered')
+
 
 # Set ax limits on marginals
 ax_joint.set_xlim([xmin,xmax])
@@ -849,7 +865,8 @@ plt.subplots_adjust(left = 0.14,
 
 filename = outdir + 'analys_POS.pdf'
 fig.savefig(filename, dpi = 1000)
-
+#plt.show()
+#stop()
 
 # LOS PLOT
 # ======
@@ -865,21 +882,24 @@ ax_joint = fig.add_subplot(gs[1:5,0:4])
 ax_marg_x = fig.add_subplot(gs[0,0:4])
 ax_marg_y = fig.add_subplot(gs[1:5,4])
 
-xmin, ymin = 80,0
-xmax, ymax = 550,4
-
 # LOS
-x = per_los_m
-y = A_los_m
+x = per_los_m[np.where(dphi>=-5)]
+y = A_los_m[np.where(dphi>=-5)]
 
+xmin, ymin = 70, 0
+xmax, ymax = 400,3
 
 #angle = 90.-(np.arctan((ymax-ymin)/float(xmax-xmin))*360./(2*np.pi))
 #ax_joint.plot(xy,xy,alpha = 0.5, color = 'black', linewidth = 1., linestyle = '--')#, linestyle = '--')
 #ax_joint.text(xmax - 60,ymax - 0.55,'y = x', alpha = 0.5, color = 'black', rotation = angle, fontsize = 8)
 
-ax_joint.scatter(x, y, alpha = 0.25, color = 'orangered')
-ax_marg_x.hist(x, color = 'orangered', rwidth = 0.95, alpha = 0.5, bins = bins)
-ax_marg_y.hist(y,orientation="horizontal", color = 'orangered', alpha = 0.5, rwidth = 0.95, bins = bins/2)
+#ax_joint.scatter(x, y, alpha = 0.25, color = 'orangered')
+#ax_marg_x.hist(x, color = 'orangered', rwidth = 0.95, alpha = 0.5, bins = bins)
+#ax_marg_y.hist(y,orientation="horizontal", color = 'orangered', alpha = 0.5, rwidth = 0.95, bins = bins/2)
+sns.kdeplot(x,y, cmap = 'Reds', ax = ax_joint, shade = True)
+sns.kdeplot(y, ax = ax_marg_y, shade=True, color = 'orangered', vertical = True)
+sns.kdeplot(x, ax = ax_marg_x, shade=True, color = 'orangered')
+
 
 # Set ax limits on marginals
 ax_joint.set_xlim([xmin,xmax])
