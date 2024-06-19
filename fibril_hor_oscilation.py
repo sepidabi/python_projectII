@@ -427,8 +427,8 @@ if(mode==2):
 # CURVE FITTING
 ########################
 if(mode==3):
-    cut = cut2
-    cut_file = cut2_file
+    cut = cut3
+    cut_file = cut3_file
     cube_raw = np.mean(cut.loop_slab[w_pos-3:w_pos+3,:,:],axis = 0).squeeze()*1e9
     cut_fname = outdir+cut_file[-11:-5]+'.txt'
 
@@ -440,7 +440,7 @@ if(mode==3):
     cube_med = exposure.rescale_intensity(sgnl.medfilt2d(cube_trunc,kernel_size = [3,1]), out_range=(0, 1.))
     cube_sharp = exposure.rescale_intensity(sharpen(cube_trunc, sigma =[3,1], unsigma = [1,3]), out_range=(0, 1.))
     cube = exposure.rescale_intensity(exposure.adjust_gamma(cube_sharp,0.1), out_range=(0, 1.))
-    vmin, vmax = 0.9, 0.97
+    #vmin, vmax = 0.9, 0.97
 
     
     # to test the curve fitting
@@ -494,6 +494,11 @@ if(mode==3):
     ax1.set_xticklabels(xtick_lab2, fontdict = font)
     ax1.xaxis.set_minor_locator(AutoMinorLocator(5))
     ax1.set_ylim(0,nt-1)
+
+    fact = 2.5
+    cube = cube_sharp
+    vmin = np.mean(cube) - fact*np.std(cube)
+    vmax = np.mean(cube) + fact*np.std(cube)
     
     ax1.imshow(cube,
                cmap = 'gray', origin = 'lower', #aspect=ratio

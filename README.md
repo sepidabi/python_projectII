@@ -63,4 +63,8 @@ The purpose of this script is to:
 
 ## fibril_object_results.py: plots the statistical anlysis results
 
-## fibril_proto_plot.py: plots the proto-oscillations (examples of the categories)
+## fibril_single_plot_new.py: plotting the proto-oscillations from each categories in 2&3D
+
+## fibril_hor_oscilation.py: tracking oscillation in the one roi example
+
+## fibril_single_oscillation.py: plot the one specific oscillation inversion and tracking results

@@ -221,8 +221,15 @@ for i in range(len(file_search(objresdir, "*.obj"))):
     theta = np.append(theta, result.theta)
     per_m = np.append(per_m, result.per_m)
     per_dom = np.append(per_dom, result.per_dom)
-    ratio = np.append(ratio, result.ratio)
-    dist = np.append(dist, result.dist)
+
+# Print statistics for the paper
+print('     , min , max , mean , dev')
+print('P_pos_m: ', np.round(np.array([np.min(per_pos_m), np.max(per_pos_m), np.mean(per_pos_m), np.std(per_pos_m)]), decimals = 0))
+print('P_los_m: ', np.round(np.array([np.min(per_los_m), np.max(per_los_m), np.mean(per_los_m), np.std(per_los_m)]), decimals = 0))
+print('A_pos_m: ', np.round(np.array([np.min(A_pos_m), np.max(A_pos_m), np.mean(A_pos_m), np.std(A_pos_m)]), decimals = 2))
+print('A_los_m: ', np.round(np.array([np.min(A_los_m), np.max(A_los_m), np.mean(A_los_m), np.std(A_los_m)]), decimals = 2))
+print("press 'c' to continue to the plots.")
+stop()
 
 ##########
 # JOINT PLOTS
@@ -506,7 +513,7 @@ for i in range (len(mid_coord_x)):
         sc = ax_map.scatter(x = mid_coord_x[i]-x1, y = mid_coord_y[i]-y1, c = np.abs(cor_rate[i]), marker=marker, cmap = cmap_phi, s = markersize[i], alpha = 0.45, vmin =0, vmax = 1)
         dist_i = np.sqrt(contour.find_nearest_contour(mid_coord_x[i]-x1, mid_coord_y[i]-y1)[5])
         dist = np.append(dist, dist_i)
-        ratio = np.append(ratio,dist_i/per_m[i])
+        ratio = np.append(ratio,per_m[i])#np.append(ratio,dist_i/per_m[i])
         #print(np.power(per_m[i]/np.max(per_m), 2)*ssize)
 
     #elif (dphi[i]==-5):
@@ -584,27 +591,33 @@ map_cak.savefig(filename, dpi = 1000)
 print('file saved to: '+ filename)
 #plt.show()
 #stop()
-
-# fibril didstance and period correlation
-plt.figure()
-plt.plot(dist/ratio, dist, 'r.')
-
-z = np.polyfit(dist/ratio, dist, 1)
-p = np.poly1d(z)
-plt.plot(dist/ratio, p(dist/ratio))
-
-plt.xlabel('P [s]')
-plt.ylabel('D [pixel]')
-plt.title('corr. fibril d. from mag. patch \nvs. avg. osc. period')
-
-slope = (p(dist/ratio)[-1]-p(dist/ratio)[0])/(dist[-1]/ratio[-1]-dist[0]/ratio[0])
-plt.text(270,250,'D = '+str(np.round(slope, decimals = 1))+'*P')
-
-#plt.show()
-
-
 plt.close(map_cak)
 
+
+# fibril didstance and period correlation
+#=======================
+fig = plt.figure(figsize = (4,4))
+y = ratio
+x = dist*res
+
+
+plt.scatter(x,y,alpha = 0.3, color = 'orangered')
+
+pearsonr = str(np.round(stat.pearsonr(x, y)[0],decimals = 2))
+pearsonp = str(np.int(stat.pearsonr(x, y)[1]))
+plt.annotate('pearsonr = ' + pearsonr,xy=(0.6,0.92), fontsize = 8., xycoords='axes fraction')
+
+plt.ylabel(r'$\overline{P}$ [s]', fontdict = font)
+plt.xlabel(r'$|d|$ [arcsec]', fontdict = font)
+plt.xticks(fontsize = 8.)
+plt.yticks(fontsize = 8.)
+
+plt.tight_layout()
+filename = outdir + 'per_d.pdf'
+fig.savefig(filename, dpi = 1000)
+print('file saved to: '+ filename)
+plt.show()
+stop()
 
 
 
@@ -630,8 +643,8 @@ ax_marg_y = fig.add_subplot(gs[1:5,4])
 x = per_pos_m[np.where(dphi>=-1)]
 y = per_los_m[np.where(dphi>=-1)]
 
-rmin = 70#np.min([x,y])
-rmax = np.max([x,y])
+rmin = 60#np.min([x,y])
+rmax = 500#np.max([x,y])
 
 angle = 90.-(np.arctan((ymax-ymin)/float(xmax-xmin))*360./(2*np.pi))
 ax_joint.plot(xy,xy,alpha = 0.5, color = 'black', linewidth = 1., linestyle = '--')#, linestyle = '--')
@@ -695,8 +708,8 @@ plt.subplots_adjust(left = 0.14,
 
 filename = outdir + 'analys_pp.pdf'
 fig.savefig(filename, dpi = 1000)
-plt.show()
-stop()
+#plt.show()
+#stop()
 
 # Amplitude PLOT
 # ==========
@@ -717,7 +730,7 @@ x = A_pos_m[np.where(dphi>=-1)]
 y = A_los_m[np.where(dphi>=-1)]
 
 rmin = 0#np.min([x,y])
-rmax = 3.5#np.max([x,y])
+rmax = 3.#np.max([x,y])
 
 angle = 90.-(np.arctan((ymax-ymin)/float(xmax-xmin))*360./(2*np.pi))
 ax_joint.plot(xy,xy,alpha = 0.5, color = 'black', linewidth = 1., linestyle = '--')#, linestyle = '--')
@@ -887,7 +900,7 @@ x = per_los_m[np.where(dphi>=-5)]
 y = A_los_m[np.where(dphi>=-5)]
 
 xmin, ymin = 70, 0
-xmax, ymax = 400,3
+xmax, ymax = 500,3.
 
 #angle = 90.-(np.arctan((ymax-ymin)/float(xmax-xmin))*360./(2*np.pi))
 #ax_joint.plot(xy,xy,alpha = 0.5, color = 'black', linewidth = 1., linestyle = '--')#, linestyle = '--')
@@ -952,4 +965,5 @@ filename = outdir + 'analys_LOS.pdf'
 fig.savefig(filename, dpi = 1000)
 
 plt.show()
+stop()
 plt.close('all')        

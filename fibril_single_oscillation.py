@@ -252,7 +252,7 @@ for gg in range(3):
     cube_med = exposure.rescale_intensity(sgnl.medfilt2d(cube_trunc,kernel_size = [3,1]), out_range=(0, 1.))
     cube_sharp = exposure.rescale_intensity(sharpen(cube_trunc, sigma =[3,1], unsigma = [1,3]), out_range=(0, 1.))
     cube_final = exposure.rescale_intensity(exposure.adjust_gamma(cube_sharp,0.1), out_range=(0, 1.))
-    vmin, vmax = 0.9, 0.98
+    #vmin, vmax = 0.9, 0.98
 
     cube = cube_cali
     coord = np.loadtxt(cut_fname, dtype = 'float64')
@@ -328,8 +328,13 @@ for gg in range(3):
     ax2.set_xlim(0,xlim_max)
     ax2.set_ylim(0,cube.shape[1]-abs(ylim_min)-abs(ylim_max)-1)
 
+    cub = (np.transpose(cube_final))[ylim_min:ylim_max,:xlim_max]
+    fact = 3.
+    vmin = np.mean(cub) - fact*np.std(cub)
+    vmax = np.mean(cub) + fact*np.std(cub)
+
     # 1st column
-    im = ax0.imshow((np.transpose(cube_final))[ylim_min:ylim_max,:xlim_max], cmap = 'gray', origin = 'lower', aspect=ratio,
+    im = ax0.imshow(cub, cmap = 'gray', origin = 'lower', aspect=ratio,
               vmin = vmin,#2.e-9,
               vmax=vmax#3.5e-9
     )
@@ -344,16 +349,19 @@ for gg in range(3):
     np.save('cut'+str(gg)+'.npy', (y_imax)[fr_select]/cube.shape[1])
     
     # 2nd column
-    im1 = ax1.imshow(np.transpose(temp_cube[:,:,tau_i])[ylim_min:ylim_max,:xlim_max], cmap = 'inferno', origin = 'lower', aspect=ratio,
-              vmin = 4.1,
-              vmax=5.4#3.5e-9
+    temp_cub = exposure.rescale_intensity(sharpen(np.transpose(temp_cube[:,:,tau_i])[ylim_min:ylim_max,:xlim_max], sigma =[1,3], unsigma = [3,1]), out_range=(0, 1.))
+
+    im1 = ax1.imshow(temp_cub, cmap = 'inferno', origin = 'lower', aspect=ratio,
+              #vmin = 4.1,
+              #vmax=5.4#3.5e-9
     )
     ax1.plot(ti, smth_y-ylim_min, color = 'white', alpha = 0.5, label = r'smthd I$_{\rm{max}}$')
 
     # 3rd column
     sigma = 50
     crap = spnd.filters.gaussian_filter(vlos_cube[:,:,tau_i], [sigma, sigma], mode = 'constant')
-    im2 = ax2.imshow((np.transpose(vlos_cube[:,:,tau_i]-crap))[ylim_min:ylim_max,:xlim_max], cmap = 'bwr', origin = 'lower', aspect=ratio,
+    vlos_cub = (np.transpose(vlos_cube[:,:,tau_i]-crap))[ylim_min:ylim_max,:xlim_max]
+    im2 = ax2.imshow(vlos_cub, cmap = 'bwr', origin = 'lower', aspect=ratio,
               vmin = -8.31,
               vmax=8.31
     )

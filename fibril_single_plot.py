@@ -222,7 +222,7 @@ for ii in range(len(file_search(fibdir,'crispex*3950*.csav'))):
         tmin, tmax = int(np.min(coord[:,1])), int(np.max(coord[:,1]))+1
         #arange = np.linspace(amin, amax, amax-amin+1)
         trange = np.linspace(tmin, tmax, tmax-tmin+1)
-        
+        stop()
         # coords of the centere of oscillation
         # on the FOV map
         # sin = (y2-y1)/r = (yi-y1)/d
