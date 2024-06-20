@@ -427,8 +427,8 @@ if(mode==2):
 # CURVE FITTING
 ########################
 if(mode==3):
-    cut = cut3
-    cut_file = cut3_file
+    cut = cut1
+    cut_file = cut1_file
     cube_raw = np.mean(cut.loop_slab[w_pos-3:w_pos+3,:,:],axis = 0).squeeze()*1e9
     cut_fname = outdir+cut_file[-11:-5]+'.txt'
 
@@ -441,7 +441,6 @@ if(mode==3):
     cube_sharp = exposure.rescale_intensity(sharpen(cube_trunc, sigma =[3,1], unsigma = [1,3]), out_range=(0, 1.))
     cube = exposure.rescale_intensity(exposure.adjust_gamma(cube_sharp,0.1), out_range=(0, 1.))
     #vmin, vmax = 0.9, 0.97
-
     
     # to test the curve fitting
     from scipy.optimize import curve_fit
@@ -496,7 +495,7 @@ if(mode==3):
     ax1.set_ylim(0,nt-1)
 
     fact = 2.5
-    cube = cube_sharp
+    cube = cube_raw
     vmin = np.mean(cube) - fact*np.std(cube)
     vmax = np.mean(cube) + fact*np.std(cube)
     

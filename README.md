@@ -70,3 +70,4 @@ The purpose of this script is to:
 ## fibril_single_oscillation.py: plot the one specific oscillation inversion and tracking results
 
 ## fibril_single_osc-plots.py: The oscillations in the proto-fibril cut in a new better way
+> CONTINUE FROM THE LINE 286
