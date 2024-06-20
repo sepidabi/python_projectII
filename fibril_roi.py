@@ -104,7 +104,7 @@ ca3  = mf.readfits(savedir+'roi_obs8542_fr167'+'.fits')[1,:, ymin:ymax, xmin:xma
 # chosen  factors for plotting
 tau0, tau1, tau2 = 52, 26, 21
 ltau = fr1_inv.ltau[0,0,0,:]
-crap = np.load('/home/seki2695/INV/stic/fov/crap.npy')[:,:,:,1]
+crap = np.load('/storage/users/sepid/INV/stic/fov/crap.npy')[:,:,:,1]
 
 cmaps = ['gray', 'gray', 'gray', 'inferno', 'inferno' , 'inferno' , 'bwr', 'bwr', 'bwr']*4
 vmin = [ 13, 10., 2.,
@@ -266,39 +266,39 @@ for j in range(ncol):
 
         r1 = np.sqrt((x02-x01)**2+(y02-y01)**2)
         r2 = np.sqrt((x02-x03)**2+(y02-y03)**2)
-        print(np.mean([r1/(8*dphi.shape
-                           (71-68)),r2/(8*(79-71))])*res*725)
-        print(np.mean([r1/(8*(123-119)),r2/(8*(129-123))])*res*725)
+        #print(np.mean([r1/(8*dphi.shape
+          #                 (71-68)),r2/(8*(79-71))])*res*725)
+        #print(np.mean([r1/(8*(123-119)),r2/(8*(129-123))])*res*725)
 
         if(j==2):
-            if(i==3):
-                ax.plot(fib.x_coords-xmin, fib.y_coords-ymin, color = 'orangered', alpha = 0.5)
-                ax.plot(cut1.x_loop_pts[4:-1]-xmin, cut1.y_loop_pts[4:-1]-ymin, color = 'orangered', linestyle = '--', alpha = 0.65,linewidth = 1)
-                ax.plot(cut2.x_loop_pts[4:-1]-xmin, cut2.y_loop_pts[4:-1]-ymin, color = 'orangered', linestyle = '--', alpha = 0.65,linewidth = 1)
-                ax.plot(cut3.x_loop_pts[4:-1]-xmin, cut3.y_loop_pts[4:-1]-ymin, color = 'orangered', linestyle = '--', alpha = 0.65,linewidth = 1)
+            #ax.plot(fib.x_coords-xmin, fib.y_coords-ymin, color = 'orangered', alpha = 0.5)
+            ax.plot(cut1.x_loop_pts[4:-1]-xmin, cut1.y_loop_pts[4:-1]-ymin, color = 'orangered', linestyle = '--', alpha = 0.65,linewidth = 1)
+            ax.plot(cut2.x_loop_pts[4:-1]-xmin, cut2.y_loop_pts[4:-1]-ymin, color = 'orangered', linestyle = '--', alpha = 0.65,linewidth = 1)
+            ax.plot(cut3.x_loop_pts[4:-1]-xmin, cut3.y_loop_pts[4:-1]-ymin, color = 'orangered', linestyle = '--', alpha = 0.65,linewidth = 1)
+            if(i==0):
                 ax.text(cut1.x_coords[0]-xmin-4, cut1.y_coords[0]-ymin+6, '(3)', fontdict=font, color = 'orangered')
                 ax.text(cut2.x_coords[0]-xmin-4, cut2.y_coords[0]-ymin+6, '(2)', fontdict=font, color = 'orangered')
                 ax.text(cut3.x_coords[0]-xmin-4, cut3.y_coords[0]-ymin+6, '(1)', fontdict=font, color = 'orangered')
-            else:
-                ax.scatter(x = np.array([x01, x02, x03])-xmin, y = np.array([y01, y02, y03])-ymin, color = 'orangered', s = 5, alpha = 0.7)
-                xint = np.linspace(np.int(np.round(x01)),np.int(np.round(x03)),np.int(np.round(x03))-np.int(np.round(x01))+1)
-                yint = np.interp(xint, np.array([x01, x02, x03]), np.array([y01, y02, y03]))
-                ax.plot(xint-xmin, yint-ymin, alpha = 0.5)
+                #else:
+                #ax.scatter(x = np.array([x01, x02, x03])-xmin, y = np.array([y01, y02, y03])-ymin, color = 'orangered', s = 5, alpha = 0.7)
+                #xint = np.linspace(np.int(np.round(x01)),np.int(np.round(x03)),np.int(np.round(x03))-np.int(np.round(x01))+1)
+                #yint = np.interp(xint, np.array([x01, x02, x03]), np.array([y01, y02, y03]))
+                #ax.plot(xint-xmin, yint-ymin, alpha = 0.5)
 
-        if(j==8):
-            if(i==3):
-                print('')
-            else:
-                ax.scatter(x = np.array([x01, x02, x03])-xmin, y = np.array([y01, y02, y03])-ymin, color = 'black', s = 5, alpha = 0.5)
+        #if(j==8):
+         #   if(i==3):
+          #      print('')
+            #else:
+                #ax.scatter(x = np.array([x01, x02, x03])-xmin, y = np.array([y01, y02, y03])-ymin, color = 'black', s = 5, alpha = 0.5)
         
-        if(i==3 and j==5):
-            ax.plot(fib.x_coords-xmin, fib.y_coords-ymin, color = 'white', alpha = 0.5)
+        if(i==0 and j==5):
+            #ax.plot(fib.x_coords-xmin, fib.y_coords-ymin, color = 'white', alpha = 0.5)
             ax.plot(cut1.x_loop_pts[4:-1]-xmin, cut1.y_loop_pts[4:-1]-ymin, color = 'white', linestyle = '--', alpha = 0.5,linewidth = 1)
             ax.plot(cut2.x_loop_pts[4:-1]-xmin, cut2.y_loop_pts[4:-1]-ymin, color = 'white', linestyle = '--', alpha = 0.5,linewidth = 1)
             ax.plot(cut3.x_loop_pts[4:-1]-xmin, cut3.y_loop_pts[4:-1]-ymin, color = 'white', linestyle = '--', alpha = 0.5,linewidth = 1)
 
-        if(i==3 and j==8):
-            ax.plot(fib.x_coords-xmin, fib.y_coords-ymin, color = 'black', alpha = 0.5)
+        if(i==0 and j==8):
+            #ax.plot(fib.x_coords-xmin, fib.y_coords-ymin, color = 'black', alpha = 0.5)
             ax.plot(cut1.x_loop_pts[4:-1]-xmin, cut1.y_loop_pts[4:-1]-ymin, color = 'black', linestyle = '--', alpha = 0.5,linewidth = 1)
             ax.plot(cut2.x_loop_pts[4:-1]-xmin, cut2.y_loop_pts[4:-1]-ymin, color = 'black', linestyle = '--', alpha = 0.5,linewidth = 1)
             ax.plot(cut3.x_loop_pts[4:-1]-xmin, cut3.y_loop_pts[4:-1]-ymin, color = 'black', linestyle = '--', alpha = 0.5,linewidth = 1)

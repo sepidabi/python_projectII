@@ -51,7 +51,7 @@ The class under which each object assigned to each oscillation follows as:
                  ):
 
 ## fibril_oscillation_final_check.py: Provides the chance to visually inspect the traced fibrils to make sure that the automatic judjemt in oscillations validity is actually correct
-# So the oscillations in general iclude the following categories:
+So the oscillations in general iclude the following categories:
 - the ones that oscillate long enough to define a dphi for them in [-1,1]
 - The ones that oscillate in both direcitions long enough but are not correlated (dphi = -5)
 - The ones where the oscillations are so short (less than one full period) that it is not possible to define dphi (dphi=-10)
@@ -68,3 +68,5 @@ The purpose of this script is to:
 ## fibril_hor_oscilation.py: tracking oscillation in the one roi example
 
 ## fibril_single_oscillation.py: plot the one specific oscillation inversion and tracking results
+
+## fibril_single_osc-plots.py: The oscillations in the proto-fibril cut in a new better way
